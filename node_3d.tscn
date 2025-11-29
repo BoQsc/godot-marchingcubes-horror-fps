@@ -1,11 +1,63 @@
-[gd_scene load_steps=17 format=3 uid="uid://c2pp8ci31jce2"]
+[gd_scene load_steps=20 format=3 uid="uid://c2pp8ci31jce2"]
 
 [ext_resource type="AudioStream" uid="uid://i6o3hrbi2ac2" path="res://music/mysterious-dark-background-310162.mp3" id="1_i5arm"]
 [ext_resource type="Script" path="res://Player.gd" id="1_player"]
+[ext_resource type="PackedScene" uid="uid://bsiwysbjrs4v6" path="res://props/rigged_animated_cinematic_quality_tree_4.glb" id="1_wc5p8"]
 [ext_resource type="Script" uid="uid://duyja5u7s3uww" path="res://TerrainManager.gd" id="2_terrain"]
 [ext_resource type="PackedScene" uid="uid://b8j2q4x5y607" path="res://MarchingCubesChunk.tscn" id="3_chunk"]
 [ext_resource type="PackedScene" uid="uid://o6xj2jdgavj" path="res://male_zombie.glb" id="3_jka67"]
 [ext_resource type="PackedScene" uid="uid://1xh5cq6f56t3" path="res://heavy_pistol_animated.glb" id="4_r3fl7"]
+
+[sub_resource type="GDScript" id="GDScript_jsk3o"]
+script/source = "extends CharacterBody3D
+
+# --- Settings ---
+@export var gravity: float = 9.8
+
+# --- References ---
+# Finds the AnimationPlayer inside the new node name \"Sketchfab_Scene tree\"
+@onready var anim_player = $\"Sketchfab_Scene tree\".find_child(\"AnimationPlayer\")
+
+func _ready():
+	if anim_player:
+		# 1. SETUP ANIMATION
+		# We check if the animation exists to prevent errors
+		if anim_player.has_animation(\"MorphBake\"):
+			var anim = anim_player.get_animation(\"MorphBake\")
+			
+			# Ensure it loops automatically (Standard linear loop)
+			anim.loop_mode = Animation.LOOP_LINEAR
+			
+			# Play the specific animation
+			anim_player.play(\"Scene\")
+		
+		# Sync animation to physics to prevent visual jitter
+		anim_player.callback_mode_process = AnimationPlayer.ANIMATION_CALLBACK_MODE_PROCESS_PHYSICS
+
+func _physics_process(delta):
+	# 1. Gravity
+	# We keep gravity so the tree sits properly on the ground/mesh
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+	else:
+		velocity.y = -0.1 # Keep glued to floor to prevent micro-bouncing
+
+	# 2. Ensure No Horizontal Movement
+	# We explicitly zero this out to ensure it never slides
+	velocity.x = 0
+	velocity.z = 0
+
+	# 3. Apply Physics
+	move_and_slide()
+	
+	# Void Safety
+	# If the map accidentally disappears or the tree falls through
+	if global_position.y < -50:
+		velocity = Vector3.ZERO
+		global_position = Vector3(0, 5, 0)
+"
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_wc5p8"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4xowi"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -494,6 +546,17 @@ func _play_random_sound():
 "
 
 [node name="Node3D" type="Node3D"]
+
+[node name="CharacterBody3D4" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 54.100525, 0)
+script = SubResource("GDScript_jsk3o")
+
+[node name="Sketchfab_Scene tree" parent="CharacterBody3D4" instance=ExtResource("1_wc5p8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -23.931396, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -23.115135, 0)
+shape = SubResource("CapsuleShape3D_wc5p8")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("1_i5arm")
