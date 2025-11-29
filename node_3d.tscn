@@ -1,8 +1,9 @@
-[gd_scene load_steps=12 format=3 uid="uid://c2pp8ci31jce2"]
+[gd_scene load_steps=15 format=3 uid="uid://c2pp8ci31jce2"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_player"]
 [ext_resource type="Script" uid="uid://duyja5u7s3uww" path="res://TerrainManager.gd" id="2_terrain"]
 [ext_resource type="PackedScene" uid="uid://b8j2q4x5y607" path="res://MarchingCubesChunk.tscn" id="3_chunk"]
+[ext_resource type="PackedScene" uid="uid://o6xj2jdgavj" path="res://male_zombie.glb" id="3_jka67"]
 [ext_resource type="PackedScene" uid="uid://1xh5cq6f56t3" path="res://heavy_pistol_animated.glb" id="4_r3fl7"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4xowi"]
@@ -17,6 +18,117 @@ background_mode = 2
 sky = SubResource("Sky_a202f")
 tonemap_mode = 2
 glow_enabled = true
+
+[sub_resource type="GDScript" id="GDScript_i5arm"]
+script/source = "extends CharacterBody3D
+
+# --- Settings ---
+@export var move_speed: float = 0.1  # Updated as requested
+@export var gravity: float = 2.0     # Updated as requested
+
+# --- References ---
+@onready var anim_player = $\"Sketchfab_Scene zombie\".find_child(\"AnimationPlayer\")
+var wall_detector: RayCast3D 
+
+# --- State ---
+var current_state = \"IDLE\" 
+var wander_timer: float = 0.0
+
+func _ready():
+	# 1. SETUP NOSE (Wall Detector)
+	wall_detector = RayCast3D.new()
+	wall_detector.name = \"WallDetector\"
+	add_child(wall_detector)
+	wall_detector.position.y = 1.0 
+	wall_detector.enabled = true
+	wall_detector.add_exception(self) 
+	
+	# MOVEMENT FIX: Point the nose to Positive Z (since we inverted movement)
+	wall_detector.target_position = Vector3(0, 0, 1.0) 
+
+	# 2. START ANIMATION LOOP
+	if anim_player:
+		# Play the master file once, we control the loop manually below
+		anim_player.play(\"Take 001\")
+		if anim_player.has_animation(\"Take 001\"):
+			anim_player.get_animation(\"Take 001\").loop_mode = Animation.LOOP_LINEAR
+
+	# 3. SAFETY START
+	set_physics_process(false)
+	await get_tree().create_timer(1.0).timeout
+	set_physics_process(true)
+	
+	change_state(\"IDLE\")
+
+func _physics_process(delta):
+	# 1. Gravity
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+
+	# 2. Manual Animation Slicing (0-1s Idle, 1-2s Walk)
+	if anim_player:
+		var current_time = anim_player.current_animation_position
+		
+		match current_state:
+			\"IDLE\":
+				# Loop 0.0 to 1.0
+				if current_time >= 1.0:
+					anim_player.seek(0.0)
+			\"WALK\":
+				# Loop 1.0 to 2.0
+				if current_time >= 2.0 or current_time < 1.0:
+					anim_player.seek(1.0)
+
+	# 3. Movement Logic
+	if current_state == \"IDLE\":
+		velocity.x = move_toward(velocity.x, 0, move_speed * delta)
+		velocity.z = move_toward(velocity.z, 0, move_speed * delta)
+		
+		wander_timer -= delta
+		if wander_timer <= 0:
+			pick_random_direction()
+			change_state(\"WALK\")
+			
+	elif current_state == \"WALK\":
+		# MOVEMENT FIX: Removed the \"-\" sign. 
+		# Now using Positive Z (transform.basis.z) to inverse movement.
+		var forward_dir = transform.basis.z 
+		
+		velocity.x = forward_dir.x * move_speed
+		velocity.z = forward_dir.z * move_speed
+		
+		wander_timer -= delta
+		if wall_detector.is_colliding() or wander_timer <= 0:
+			change_state(\"IDLE\")
+
+	move_and_slide()
+	
+	# Void Safety
+	if global_position.y < -50:
+		velocity = Vector3.ZERO
+		global_position = Vector3(0, 5, 0)
+
+func change_state(new_state):
+	current_state = new_state
+	
+	if new_state == \"IDLE\":
+		if anim_player: anim_player.seek(0.0)
+		wander_timer = randf_range(2.0, 4.0) 
+		
+	elif new_state == \"WALK\":
+		if anim_player: anim_player.seek(1.0)
+		wander_timer = randf_range(3.0, 6.0) 
+
+func pick_random_direction():
+	# Rotates the whole body. Since velocity uses basis.z, he moves where he looks.
+	var random_turn = deg_to_rad(randf_range(90, 270)) 
+	rotate_y(random_turn)
+
+func apply_knockback(force: Vector3):
+	velocity += force
+"
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jka67"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_noarx"]
 
@@ -331,7 +443,6 @@ func remove_block():
 		if result.collider.is_in_group(\"blocks\"):
 			result.collider.queue_free()
 			spawn_hit_effect(result.position) # Visual feedback
-
 "
 
 [node name="Node3D" type="Node3D"]
@@ -348,8 +459,18 @@ script = ExtResource("2_terrain")
 chunk_scene = ExtResource("3_chunk")
 player = NodePath("../PlayerCharacter3D")
 
+[node name="CharacterBody3D" type="CharacterBody3D" parent="."]
+transform = Transform3D(6.24, 0, 0, 0, 6.24, 0, 0, 0, 6.24, 0, 106.177025, -3.4154072)
+script = SubResource("GDScript_i5arm")
+
+[node name="Sketchfab_Scene zombie" parent="CharacterBody3D" instance=ExtResource("3_jka67")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
+transform = Transform3D(0.085, 0, 0, 0, 0.085, 0, 0, 0, 0.085, 0, 0.08586693, 0)
+shape = SubResource("CapsuleShape3D_jka67")
+
 [node name="PlayerCharacter3D" type="CharacterBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 215.4012, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 107.50628, 0)
 script = ExtResource("1_player")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="PlayerCharacter3D"]
