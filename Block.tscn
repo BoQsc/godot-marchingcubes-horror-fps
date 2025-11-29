@@ -12,8 +12,16 @@ size = Vector3(1, 1, 1)
 [sub_resource type="GDScript" id="GDScript_block"]
 script/source = "extends StaticBody3D
 
+var health = 4
+
 func _ready():
 	add_to_group(\"blocks\")
+
+func take_damage(amount):
+	health -= amount
+	# Visual feedback could go here (e.g. flash red)
+	if health <= 0:
+		queue_free()
 "
 
 [node name="Block" type="StaticBody3D"]

@@ -178,7 +178,14 @@ func fire_raycast():
 	var result = space_state.intersect_ray(query)
 	
 	if result:
-		# If we hit something, spawn the effect at the hit position
+		if result.collider.is_in_group(\"blocks\") and result.collider.has_method(\"take_damage\"):
+			result.collider.take_damage(1)
+		else:
+			# Micro-digging on terrain
+			var tm = get_node(\"/root/Node3D/TerrainManager\")
+			if tm:
+				tm.modify_terrain(result.position, 2.0, \"sphere\", 0.5)
+		
 		spawn_hit_effect(result.position)
 
 func spawn_hit_effect(pos):
