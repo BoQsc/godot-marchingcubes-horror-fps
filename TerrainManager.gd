@@ -102,3 +102,17 @@ func process_generation_queue():
 
 func _on_chunk_generation_complete(_coord):
 	current_active_tasks -= 1
+
+func modify_terrain(global_pos: Vector3, amount: float):
+	var chunk_world_size = grid_size * scale_factor
+	
+	# Calculate chunk coordinates
+	var cx = int(floor(global_pos.x / chunk_world_size))
+	var cz = int(floor(global_pos.z / chunk_world_size))
+	var coord = Vector3i(cx, 0, cz)
+	
+	if active_chunks.has(coord):
+		var chunk = active_chunks[coord]
+		var local_pos = global_pos - chunk.global_position
+		# Radius 3.0, Amount passed in (positive to dig/add air)
+		chunk.modify_terrain(local_pos, 3.0, amount)

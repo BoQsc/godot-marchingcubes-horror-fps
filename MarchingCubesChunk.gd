@@ -25,6 +25,15 @@ func _ready():
 	mat.roughness = 0.8
 	self.material_override = mat
 
+# Threading & Synchronization
+var thread: Thread
+var mutex: Mutex = Mutex.new()
+var field: PackedFloat32Array
+
+func _exit_tree():
+	if thread and thread.is_started():
+		thread.wait_to_finish()
+
 func start_generation(p_chunk_coord, p_grid_size, p_iso_level, p_scale_factor, p_terrain_height, p_noise):
 	chunk_coord = p_chunk_coord
 	grid_size = p_grid_size
@@ -34,8 +43,48 @@ func start_generation(p_chunk_coord, p_grid_size, p_iso_level, p_scale_factor, p
 	noise = p_noise
 	
 	# Start thread
-	var thread = Thread.new()
+	if thread and thread.is_started():
+		thread.wait_to_finish()
+	
+	thread = Thread.new()
 	thread.start(_generate.bind(thread))
+
+func modify_terrain(local_pos: Vector3, radius: float, amount: float):
+	# Convert local position (scaled) to grid coordinates
+	var center_x = local_pos.x / scale_factor
+	var center_y = local_pos.y / scale_factor
+	var center_z = local_pos.z / scale_factor
+	
+	var r_sq = (radius / scale_factor) ** 2
+	var s = grid_size + 1
+	var s2 = s * s
+	
+	var min_x = int(max(0, center_x - radius))
+	var max_x = int(min(grid_size, center_x + radius))
+	var min_y = int(max(0, center_y - radius))
+	var max_y = int(min(grid_size, center_y + radius))
+	var min_z = int(max(0, center_z - radius))
+	var max_z = int(min(grid_size, center_z + radius))
+	
+	var modified = false
+	
+	mutex.lock()
+	if field.size() == s*s*s:
+		for x in range(min_x, max_x + 1):
+			for y in range(min_y, max_y + 1):
+				for z in range(min_z, max_z + 1):
+					var dist_sq = (x - center_x)**2 + (y - center_y)**2 + (z - center_z)**2
+					if dist_sq <= r_sq:
+						var idx = x * s2 + y * s + z
+						field[idx] += amount
+						modified = true
+	mutex.unlock()
+
+	if modified:
+		if thread and thread.is_started():
+			thread.wait_to_finish()
+		thread = Thread.new()
+		thread.start(_generate.bind(thread))
 
 func _generate(thread_ref):
 	var st = SurfaceTool.new()
@@ -43,20 +92,23 @@ func _generate(thread_ref):
 	
 	var s = grid_size + 1
 	var s2 = s * s
-	var field = PackedFloat32Array()
-	field.resize(s * s * s)
 	
-	# Determine global offset for noise continuity
-	var global_offset_x = chunk_coord.x * grid_size
-	var global_offset_z = chunk_coord.z * grid_size
-	
-	for x in range(s):
-		for y in range(s):
-			for z in range(s):
-				# Use GLOBAL coordinates for noise
-				var val = noise.get_noise_3d(global_offset_x + x, y, global_offset_z + z)
-				var density = -float(y) + (val * terrain_height) + (grid_size / 2.0)
-				field[x * s2 + y * s + z] = -density
+	mutex.lock()
+	if field.is_empty():
+		field.resize(s * s * s)
+		
+		# Determine global offset for noise continuity
+		var global_offset_x = chunk_coord.x * grid_size
+		var global_offset_z = chunk_coord.z * grid_size
+		
+		for x in range(s):
+			for y in range(s):
+				for z in range(s):
+					# Use GLOBAL coordinates for noise
+					var val = noise.get_noise_3d(global_offset_x + x, y, global_offset_z + z)
+					var density = -float(y) + (val * terrain_height) + (grid_size / 2.0)
+					field[x * s2 + y * s + z] = -density
+	mutex.unlock()
 
 	# Standard Marching Cubes (same as before)
 	for x in range(grid_size):
@@ -89,6 +141,7 @@ func _generate(thread_ref):
 				
 				var vert_list = []
 				vert_list.resize(12)
+				vert_list.fill(Vector3.ZERO)
 				
 				if (EDGE_TABLE[cube_index] & 1): vert_list[0] = vertex_interp(iso_level, corners[0], corners[1], vals[0], vals[1])
 				if (EDGE_TABLE[cube_index] & 2): vert_list[1] = vertex_interp(iso_level, corners[1], corners[2], vals[1], vals[2])

@@ -117,9 +117,13 @@ func _input(event):
 	# Check if the event is a Mouse Button event
 	if event is InputEventMouseButton:
 		# Check if it is the Left Mouse Button and it is currently being pressed (down)
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			play_animation_segment()
-			fire_raycast() # Check for hits
+		if event.pressed:
+			if event.button_index == MOUSE_BUTTON_LEFT:
+				play_animation_segment()
+				fire_raycast() # Check for hits
+			elif event.button_index == MOUSE_BUTTON_RIGHT:
+				play_animation_segment()
+				fire_dig()
 
 func play_animation_segment():
 	# check if the animation exists to avoid errors
@@ -188,6 +192,26 @@ func spawn_hit_effect(pos):
 	await get_tree().create_timer(2.0).timeout
 	if is_instance_valid(mesh_instance):
 		mesh_instance.queue_free()
+
+func fire_dig():
+	var camera = get_viewport().get_camera_3d()
+	if not camera: return
+	
+	var center_screen = get_viewport().get_visible_rect().size / 2
+	var from = camera.project_ray_origin(center_screen)
+	var to = from + camera.project_ray_normal(center_screen) * 1000
+	var space_state = get_world_3d().direct_space_state
+	var query = PhysicsRayQueryParameters3D.create(from, to)
+	var result = space_state.intersect_ray(query)
+	
+	if result:
+		# Find TerrainManager - Safest way for this specific scene structure
+		var tm = get_node(\"/root/Node3D/TerrainManager\")
+		if tm:
+			# Digging: Add positive value (Air)
+			tm.modify_terrain(result.position, 5.0)
+		
+		spawn_hit_effect(result.position)
 "
 
 [node name="Node3D" type="Node3D"]
