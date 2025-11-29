@@ -134,8 +134,10 @@ func _input(event):
 				play_animation_segment()
 				if Input.is_key_pressed(KEY_ALT):
 					remove_block() # Alt + Right Click to remove object
-				else:
-					fire_dig()
+				elif Input.is_key_pressed(KEY_CTRL):
+					fire_dig() # Ctrl + Right Click to dig terrain
+				# else: plain Right Click does nothing, freeing it up
+
 
 func play_animation_segment():
 	# check if the animation exists to avoid errors
