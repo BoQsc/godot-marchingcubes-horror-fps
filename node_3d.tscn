@@ -555,7 +555,7 @@ script = SubResource("GDScript_jsk3o")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -23.931396, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D4"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -23.115135, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -23.115135, -0.13289416)
 shape = SubResource("CapsuleShape3D_wc5p8")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
