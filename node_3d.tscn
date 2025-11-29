@@ -562,3 +562,31 @@ script = SubResource("GDScript_r3fl7")
 
 [node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="PlayerCharacter3D"]
 script = SubResource("GDScript_wc5p8")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="PlayerCharacter3D"]
+
+[node name="Control" type="Control" parent="PlayerCharacter3D/CanvasLayer"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="PlayerCharacter3D/CanvasLayer/Control"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Best game 3 Mouse Controls: 
+
+
+                                   Mouse
+
+Left Mouse: Shoot                       Right Mouse: Nothing
+
+                                    SHIFT:
+Left Mouse: Box                         Right Mouse: Road
+
+                                    CTRL:
+Left Mouse: Sphere                         Right Mouse: Dig
+
+                                      ALT:
+Left Mouse: Place                         Right Mouse: Remove"
