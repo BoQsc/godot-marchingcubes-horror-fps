@@ -105,14 +105,18 @@ func _on_chunk_generation_complete(_coord):
 
 func modify_terrain(global_pos: Vector3, amount: float):
 	var chunk_world_size = grid_size * scale_factor
+	var radius = 3.0 # The radius used for digging
 	
-	# Calculate chunk coordinates
-	var cx = int(floor(global_pos.x / chunk_world_size))
-	var cz = int(floor(global_pos.z / chunk_world_size))
-	var coord = Vector3i(cx, 0, cz)
+	# Determine range of chunks affected
+	var min_x = int(floor((global_pos.x - radius) / chunk_world_size))
+	var max_x = int(floor((global_pos.x + radius) / chunk_world_size))
+	var min_z = int(floor((global_pos.z - radius) / chunk_world_size))
+	var max_z = int(floor((global_pos.z + radius) / chunk_world_size))
 	
-	if active_chunks.has(coord):
-		var chunk = active_chunks[coord]
-		var local_pos = global_pos - chunk.global_position
-		# Radius 3.0, Amount passed in (positive to dig/add air)
-		chunk.modify_terrain(local_pos, 3.0, amount)
+	for x in range(min_x, max_x + 1):
+		for z in range(min_z, max_z + 1):
+			var coord = Vector3i(x, 0, z)
+			if active_chunks.has(coord):
+				var chunk = active_chunks[coord]
+				var local_pos = global_pos - chunk.global_position
+				chunk.modify_terrain(local_pos, radius, amount)
