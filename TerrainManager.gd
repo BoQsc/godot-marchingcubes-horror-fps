@@ -6,6 +6,7 @@ extends Node3D
 @export_group("Settings")
 @export var render_distance: int = 8 # Increased default
 @export var chunks_per_frame: int = 8 # Process multiple chunks per frame
+@export var max_concurrent_tasks: int = 8 # Limit threads to prevent freezing
 @export var grid_size: int = 32
 @export var scale_factor: float = 1.0
 @export var terrain_height: float = 30.0
@@ -14,6 +15,7 @@ var noise = FastNoiseLite.new()
 var active_chunks = {} # Key: Vector3i, Value: Chunk Instance
 var chunks_in_queue = {} # Key: Vector3i, Value: true (Fast lookup)
 var chunks_to_generate = [] # Array of Vector3i for ordering
+var current_active_tasks: int = 0
 
 func _ready():
 	noise.seed = randi()
@@ -71,9 +73,8 @@ func update_chunks():
 func process_generation_queue():
 	if chunks_to_generate.is_empty(): return
 	
-	for i in range(chunks_per_frame):
-		if chunks_to_generate.is_empty(): break
-		
+	# Only start new tasks if we have capacity
+	while current_active_tasks < max_concurrent_tasks and not chunks_to_generate.is_empty():
 		var coord = chunks_to_generate.pop_front()
 		chunks_in_queue.erase(coord) # Remove from queue lookup
 		
@@ -89,8 +90,15 @@ func process_generation_queue():
 		)
 		chunk.global_position = world_pos
 		
+		# Connect signal to release task slot
+		chunk.generation_complete.connect(_on_chunk_generation_complete)
+		current_active_tasks += 1
+		
 		# Store reference
 		active_chunks[coord] = chunk
 		
 		# Start generation
 		chunk.start_generation(coord, grid_size, 0.0, scale_factor, terrain_height, noise)
+
+func _on_chunk_generation_complete(_coord):
+	current_active_tasks -= 1
