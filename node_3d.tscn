@@ -118,9 +118,12 @@ func _input(event):
 	if event is InputEventMouseButton:
 		if event.pressed:
 			if event.button_index == MOUSE_BUTTON_LEFT:
-				if Input.is_key_pressed(KEY_SHIFT):
+				if Input.is_key_pressed(KEY_ALT):
 					play_animation_segment()
-					fire_build(\"box\") # Shift + Left Click to place block
+					place_block() # Alt + Left Click to place object
+				elif Input.is_key_pressed(KEY_SHIFT):
+					play_animation_segment()
+					fire_build(\"box\") # Shift + Left Click to place terrain block
 				elif Input.is_key_pressed(KEY_CTRL):
 					play_animation_segment()
 					fire_build(\"sphere\") # Ctrl + Left Click to build organic
@@ -245,20 +248,31 @@ func spawn_build_effect(pos):
 	sphere.height = 0.1
 	
 	var mat = StandardMaterial3D.new()
-	mat.albedo_color = Color.BLUE # Blue color for build effect
-	mat.emission_enabled = true
-	mat.emission = Color.BLUE
-	mat.emission_energy_multiplier = 2.0
-	
-	mesh_instance.mesh = sphere
-	mesh_instance.material_override = mat
-	
-	get_tree().root.add_child(mesh_instance)
-	mesh_instance.global_position = pos
-	
 	await get_tree().create_timer(2.0).timeout
 	if is_instance_valid(mesh_instance):
 		mesh_instance.queue_free()
+
+func place_block():
+	var camera = get_viewport().get_camera_3d()
+	if not camera: return
+	
+	var center_screen = get_viewport().get_visible_rect().size / 2
+	var from = camera.project_ray_origin(center_screen)
+	var to = from + camera.project_ray_normal(center_screen) * 1000
+	var space_state = get_world_3d().direct_space_state
+	var query = PhysicsRayQueryParameters3D.create(from, to)
+	var result = space_state.intersect_ray(query)
+	
+	if result:
+		var pos = result.position + result.normal * 0.5
+		var snapped_pos = pos.snapped(Vector3(1, 1, 1))
+		
+		var block_scene = load(\"res://Block.tscn\")
+		if block_scene:
+			var block = block_scene.instantiate()
+			get_tree().root.add_child(block)
+			block.global_position = snapped_pos
+
 "
 
 [node name="Node3D" type="Node3D"]
