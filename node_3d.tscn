@@ -1,0 +1,223 @@
+[gd_scene load_steps=12 format=3 uid="uid://c2pp8ci31jce2"]
+
+[ext_resource type="Script" path="res://Player.gd" id="1_player"]
+[ext_resource type="Script" uid="uid://duyja5u7s3uww" path="res://TerrainManager.gd" id="2_terrain"]
+[ext_resource type="PackedScene" uid="uid://b8j2q4x5y607" path="res://MarchingCubesChunk.tscn" id="3_chunk"]
+[ext_resource type="PackedScene" uid="uid://1xh5cq6f56t3" path="res://heavy_pistol_animated.glb" id="4_r3fl7"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4xowi"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_a202f"]
+sky_material = SubResource("ProceduralSkyMaterial_4xowi")
+
+[sub_resource type="Environment" id="Environment_noarx"]
+background_mode = 2
+sky = SubResource("Sky_a202f")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_noarx"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_a0tk4"]
+
+[sub_resource type="GDScript" id="GDScript_jka67"]
+script/source = "@tool
+extends Camera3D
+
+const MOUSE_SENSITIVITY = 0.002
+
+func _get_configuration_warnings():
+	var warnings = []
+	
+	if not get_parent() is CharacterBody3D:
+		warnings.append(\"Requires CharacterBody3D as a parent of Camera3D\")
+	
+	return warnings
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PARENTED and Engine.is_editor_hint():
+		call_deferred(\"update_configuration_warnings\")
+
+func _ready() -> void:
+	if Engine.is_editor_hint():
+		update_configuration_warnings()
+		return
+	
+	# Capture the mouse cursor for first-person controls
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+func _input(event: InputEvent) -> void:
+	if Engine.is_editor_hint():
+		return
+		
+	# Handle mouse look
+	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+		# Rotate parent horizontally (yaw)
+		get_parent().rotate_y(-event.relative.x * MOUSE_SENSITIVITY)
+		
+		# Rotate camera vertically (pitch)
+		rotate_object_local(Vector3.RIGHT, -event.relative.y * MOUSE_SENSITIVITY)
+		
+		# Clamp vertical rotation to prevent flipping
+		rotation.x = clamp(rotation.x, deg_to_rad(-90), deg_to_rad(90))
+
+func _unhandled_input(event: InputEvent) -> void:
+	if Engine.is_editor_hint():
+		return
+		
+	if event.is_action_pressed(\"ui_cancel\"):
+		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		else:
+			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+"
+
+[sub_resource type="GDScript" id="GDScript_r3fl7"]
+script/source = "extends Node3D
+
+# Preload the sound file
+const PISTOL_SOUND = preload(\"res://pistol-shot-233473.mp3\")
+
+# Reference to the AnimationPlayer child node
+@onready var animation_player = $AnimationPlayer
+
+# Variable to hold the dynamic audio player
+var audio_player: AudioStreamPlayer3D
+
+func _ready():
+	# 1. Setup Audio
+	audio_player = AudioStreamPlayer3D.new()
+	add_child(audio_player)
+	audio_player.stream = PISTOL_SOUND
+	# Allow up to 5 overlapping sounds so rapid clicks don't cut off previous shots
+	audio_player.max_polyphony = 5
+	
+	# 2. Setup Crosshair (UI)
+	setup_crosshair()
+
+func setup_crosshair():
+	# Create a canvas layer so the UI sits above the 3D world
+	var canvas = CanvasLayer.new()
+	add_child(canvas)
+	
+	# Create a container to center the crosshair
+	var center_cont = CenterContainer.new()
+	center_cont.set_anchors_preset(Control.PRESET_FULL_RECT) # Fill screen
+	canvas.add_child(center_cont)
+	
+	# Create the actual crosshair dot
+	var dot = ColorRect.new()
+	dot.custom_minimum_size = Vector2(4, 4) # 4x4 pixel square
+	dot.color = Color(1, 0, 0, 0.8) # Red with slight transparency
+	center_cont.add_child(dot)
+
+func _input(event):
+	# Check if the event is a Mouse Button event
+	if event is InputEventMouseButton:
+		# Check if it is the Left Mouse Button and it is currently being pressed (down)
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			play_animation_segment()
+			fire_raycast() # Check for hits
+
+func play_animation_segment():
+	# check if the animation exists to avoid errors
+	if animation_player.has_animation(\"allanims\"):
+		animation_player.stop()
+		
+		audio_player.play()
+		animation_player.play(\"allanims\")
+		
+		# Create a temporary timer for 0.3 seconds and wait for it to finish
+		await get_tree().create_timer(0.3).timeout
+		
+		# SAFETY CHECK: Ensure the node and player still exist after the wait
+		# This prevents \"Previously Freed Instance\" errors if the object is destroyed during the 0.3s wait
+		if is_instance_valid(animation_player):
+			animation_player.stop()
+	else:
+		print(\"Error: Animation 'allanims' not found in AnimationPlayer!\")
+
+func fire_raycast():
+	# Get the current active camera
+	var camera = get_viewport().get_camera_3d()
+	if not camera:
+		return
+
+	# Get center of screen
+	var center_screen = get_viewport().get_visible_rect().size / 2
+	
+	# Create ray parameters from camera center
+	var from = camera.project_ray_origin(center_screen)
+	var to = from + camera.project_ray_normal(center_screen) * 1000
+	
+	# Access the physics state
+	var space_state = get_world_3d().direct_space_state
+	var query = PhysicsRayQueryParameters3D.create(from, to)
+	
+	# Perform the raycast
+	var result = space_state.intersect_ray(query)
+	
+	if result:
+		# If we hit something, spawn the effect at the hit position
+		spawn_hit_effect(result.position)
+
+func spawn_hit_effect(pos):
+	# Create a small red sphere to represent the bullet hole/spark
+	var mesh_instance = MeshInstance3D.new()
+	var sphere = SphereMesh.new()
+	sphere.radius = 0.05
+	sphere.height = 0.1
+	
+	# Create a bright red material
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color.RED
+	mat.emission_enabled = true
+	mat.emission = Color.RED
+	mat.emission_energy_multiplier = 2.0
+	
+	mesh_instance.mesh = sphere
+	mesh_instance.material_override = mat
+	
+	# Add to the scene root (not the gun) so it stays in place in the world
+	get_tree().root.add_child(mesh_instance)
+	mesh_instance.global_position = pos
+	
+	# Destroy the effect after 2 seconds
+	await get_tree().create_timer(2.0).timeout
+	if is_instance_valid(mesh_instance):
+		mesh_instance.queue_free()
+"
+
+[node name="Node3D" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_noarx")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="TerrainManager" type="Node3D" parent="." node_paths=PackedStringArray("player")]
+script = ExtResource("2_terrain")
+chunk_scene = ExtResource("3_chunk")
+player = NodePath("../PlayerCharacter3D")
+
+[node name="PlayerCharacter3D" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 215.4012, 0)
+script = ExtResource("1_player")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PlayerCharacter3D"]
+mesh = SubResource("CapsuleMesh_noarx")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerCharacter3D"]
+shape = SubResource("CapsuleShape3D_a0tk4")
+
+[node name="Camera3D" type="Camera3D" parent="PlayerCharacter3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.49020386, 0)
+script = SubResource("GDScript_jka67")
+
+[node name="Sketchfab_Scene" parent="PlayerCharacter3D/Camera3D" instance=ExtResource("4_r3fl7")]
+transform = Transform3D(-0.0049240384, 0, 0.0008682415, 0, 0.005, 0, -0.0008682415, 0, -0.0049240384, 0.09346646, -0.09446716, -0.15498024)
+script = SubResource("GDScript_r3fl7")
