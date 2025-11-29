@@ -468,6 +468,26 @@ script = SubResource("GDScript_i5arm")
 transform = Transform3D(0.05, 0, 0, 0, 0.085, 0, 0, 0, 0.01, 0, 0.08586693, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
+[node name="CharacterBody3D2" type="CharacterBody3D" parent="."]
+transform = Transform3D(6.24, 0, 0, 0, 6.24, 0, 0, 0, 6.24, 0.667415, 106.177025, -3.4154072)
+script = SubResource("GDScript_i5arm")
+
+[node name="Sketchfab_Scene zombie" parent="CharacterBody3D2" instance=ExtResource("3_jka67")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D2"]
+transform = Transform3D(0.05, 0, 0, 0, 0.085, 0, 0, 0, 0.01, 0, 0.08586693, 0)
+shape = SubResource("CapsuleShape3D_jka67")
+
+[node name="CharacterBody3D3" type="CharacterBody3D" parent="."]
+transform = Transform3D(6.24, 0, 0, 0, 6.24, 0, 0, 0, 6.24, -0.608122, 106.177025, -3.4154072)
+script = SubResource("GDScript_i5arm")
+
+[node name="Sketchfab_Scene zombie" parent="CharacterBody3D3" instance=ExtResource("3_jka67")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D3"]
+transform = Transform3D(0.05, 0, 0, 0, 0.085, 0, 0, 0, 0.01, 0, 0.08586693, 0)
+shape = SubResource("CapsuleShape3D_jka67")
+
 [node name="PlayerCharacter3D" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 107.50628, 0)
 script = ExtResource("1_player")
