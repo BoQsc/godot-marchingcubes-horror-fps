@@ -1,5 +1,6 @@
-[gd_scene load_steps=16 format=3 uid="uid://c2pp8ci31jce2"]
+[gd_scene load_steps=17 format=3 uid="uid://c2pp8ci31jce2"]
 
+[ext_resource type="AudioStream" uid="uid://i6o3hrbi2ac2" path="res://music/mysterious-dark-background-310162.mp3" id="1_i5arm"]
 [ext_resource type="Script" path="res://Player.gd" id="1_player"]
 [ext_resource type="Script" uid="uid://duyja5u7s3uww" path="res://TerrainManager.gd" id="2_terrain"]
 [ext_resource type="PackedScene" uid="uid://b8j2q4x5y607" path="res://MarchingCubesChunk.tscn" id="3_chunk"]
@@ -496,6 +497,10 @@ func _play_random_sound():
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_noarx")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="WorldEnvironment"]
+stream = ExtResource("1_i5arm")
+autoplay = true
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
