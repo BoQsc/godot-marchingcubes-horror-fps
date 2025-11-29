@@ -120,3 +120,20 @@ func modify_terrain(global_pos: Vector3, amount: float, shape: String = "sphere"
 				var chunk = active_chunks[coord]
 				var local_pos = global_pos - chunk.global_position
 				chunk.modify_terrain(local_pos, radius, amount, shape)
+
+func modify_road(global_pos: Vector3, amount: float, radius: float = 3.0):
+	var chunk_world_size = grid_size * scale_factor
+	
+	var min_x = int(floor((global_pos.x - radius) / chunk_world_size))
+	var max_x = int(floor((global_pos.x + radius) / chunk_world_size))
+	var min_z = int(floor((global_pos.z - radius) / chunk_world_size))
+	var max_z = int(floor((global_pos.z + radius) / chunk_world_size))
+	
+	for x in range(min_x, max_x + 1):
+		for z in range(min_z, max_z + 1):
+			var coord = Vector3i(x, 0, z)
+			if active_chunks.has(coord):
+				var chunk = active_chunks[coord]
+				var local_pos = global_pos - chunk.global_position
+				if chunk.has_method("modify_road"):
+					chunk.modify_road(local_pos, radius, amount)

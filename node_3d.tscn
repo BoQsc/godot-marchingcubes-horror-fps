@@ -67,18 +67,26 @@ func _unhandled_input(event: InputEvent) -> void:
 	if Engine.is_editor_hint():
 		return
 		
+	# Toggle mouse capture when pressing Cancel (Esc)
 	if event.is_action_pressed(\"ui_cancel\"):
 		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		else:
+			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+			
+	# Click to recapture mouse if visible
+	if event is InputEventMouseButton and event.pressed:
+		if Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 "
 
 [sub_resource type="GDScript" id="GDScript_r3fl7"]
 script/source = "extends Node3D
 
-# Preload the sound file
+# Preload resources to prevent lag spikes
 const PISTOL_SOUND = preload(\"res://pistol-shot-233473.mp3\")
+# Use preload for blocks too
+const BLOCK_SCENE = preload(\"res://Block.tscn\")
 
 # Reference to the AnimationPlayer child node
 @onready var animation_player = $AnimationPlayer
@@ -105,12 +113,14 @@ func setup_crosshair():
 	# Create a container to center the crosshair
 	var center_cont = CenterContainer.new()
 	center_cont.set_anchors_preset(Control.PRESET_FULL_RECT) # Fill screen
+	center_cont.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	canvas.add_child(center_cont)
 	
 	# Create the actual crosshair dot
 	var dot = ColorRect.new()
 	dot.custom_minimum_size = Vector2(4, 4) # 4x4 pixel square
 	dot.color = Color(1, 0, 0, 0.8) # Red with slight transparency
+	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	center_cont.add_child(dot)
 
 func _input(event):
@@ -136,12 +146,13 @@ func _input(event):
 					remove_block() # Alt + Right Click to remove object
 				elif Input.is_key_pressed(KEY_CTRL):
 					fire_dig() # Ctrl + Right Click to dig terrain
+				elif Input.is_key_pressed(KEY_SHIFT):
+					fire_road_paint(1.0)
 				# else: plain Right Click does nothing, freeing it up
-
 
 func play_animation_segment():
 	# check if the animation exists to avoid errors
-	if animation_player.has_animation(\"allanims\"):
+	if animation_player and animation_player.has_animation(\"allanims\"):
 		animation_player.stop()
 		
 		audio_player.play()
@@ -151,30 +162,42 @@ func play_animation_segment():
 		await get_tree().create_timer(0.3).timeout
 		
 		# SAFETY CHECK: Ensure the node and player still exist after the wait
-		# This prevents \"Previously Freed Instance\" errors if the object is destroyed during the 0.3s wait
 		if is_instance_valid(animation_player):
 			animation_player.stop()
-	else:
-		print(\"Error: Animation 'allanims' not found in AnimationPlayer!\")
 
-func fire_raycast():
-	# Get the current active camera
+# Helper to find TerrainManager even if path changes
+func get_terrain_manager():
+	if has_node(\"/root/Node3D/TerrainManager\"):
+		return get_node(\"/root/Node3D/TerrainManager\")
+	return null
+
+func fire_road_paint(amount):
 	var camera = get_viewport().get_camera_3d()
-	if not camera:
-		return
-
-	# Get center of screen
-	var center_screen = get_viewport().get_visible_rect().size / 2
+	if not camera: return
 	
-	# Create ray parameters from camera center
+	var center_screen = get_viewport().get_visible_rect().size / 2
 	var from = camera.project_ray_origin(center_screen)
 	var to = from + camera.project_ray_normal(center_screen) * 1000
-	
-	# Access the physics state
 	var space_state = get_world_3d().direct_space_state
 	var query = PhysicsRayQueryParameters3D.create(from, to)
+	var result = space_state.intersect_ray(query)
 	
-	# Perform the raycast
+	if result:
+		var tm = get_terrain_manager()
+		if tm:
+			tm.modify_road(result.position, amount, 4.0)
+		
+		spawn_hit_effect(result.position)
+
+func fire_raycast():
+	var camera = get_viewport().get_camera_3d()
+	if not camera: return
+
+	var center_screen = get_viewport().get_visible_rect().size / 2
+	var from = camera.project_ray_origin(center_screen)
+	var to = from + camera.project_ray_normal(center_screen) * 1000
+	var space_state = get_world_3d().direct_space_state
+	var query = PhysicsRayQueryParameters3D.create(from, to)
 	var result = space_state.intersect_ray(query)
 	
 	if result:
@@ -182,7 +205,7 @@ func fire_raycast():
 			result.collider.take_damage(1)
 		else:
 			# Micro-digging on terrain
-			var tm = get_node(\"/root/Node3D/TerrainManager\")
+			var tm = get_terrain_manager()
 			if tm:
 				tm.modify_terrain(result.position, 2.0, \"sphere\", 0.5)
 		
@@ -205,7 +228,7 @@ func spawn_hit_effect(pos):
 	mesh_instance.mesh = sphere
 	mesh_instance.material_override = mat
 	
-	# Add to the scene root (not the gun) so it stays in place in the world
+	# Add to the scene root so it stays in place in the world
 	get_tree().root.add_child(mesh_instance)
 	mesh_instance.global_position = pos
 	
@@ -226,8 +249,7 @@ func fire_dig():
 	var result = space_state.intersect_ray(query)
 	
 	if result:
-		# Find TerrainManager - Safest way for this specific scene structure
-		var tm = get_node(\"/root/Node3D/TerrainManager\")
+		var tm = get_terrain_manager()
 		if tm:
 			# Digging: Add positive value (Air)
 			tm.modify_terrain(result.position, 5.0, \"sphere\")
@@ -246,7 +268,7 @@ func fire_build(shape=\"sphere\"):
 	var result = space_state.intersect_ray(query)
 	
 	if result:
-		var tm = get_node(\"/root/Node3D/TerrainManager\")
+		var tm = get_terrain_manager()
 		if tm:
 			# Building: Subtract negative value (add matter)
 			tm.modify_terrain(result.position, -5.0, shape)
@@ -256,11 +278,21 @@ func fire_build(shape=\"sphere\"):
 func spawn_build_effect(pos):
 	var mesh_instance = MeshInstance3D.new()
 	var sphere = SphereMesh.new()
-	sphere.radius = 0.05
-	sphere.height = 0.1
+	sphere.radius = 0.5 # Increased size to be visible
+	sphere.height = 1.0
 	
 	var mat = StandardMaterial3D.new()
-	await get_tree().create_timer(2.0).timeout
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.albedo_color = Color(0, 1, 0, 0.5) # Green ghost effect
+	
+	mesh_instance.mesh = sphere
+	mesh_instance.material_override = mat
+	
+	# FIX: Added add_child so the mesh actually appears
+	get_tree().root.add_child(mesh_instance)
+	mesh_instance.global_position = pos
+
+	await get_tree().create_timer(0.5).timeout
 	if is_instance_valid(mesh_instance):
 		mesh_instance.queue_free()
 
@@ -279,9 +311,8 @@ func place_block():
 		var pos = result.position + result.normal * 0.5
 		var snapped_pos = pos.snapped(Vector3(1, 1, 1))
 		
-		var block_scene = load(\"res://Block.tscn\")
-		if block_scene:
-			var block = block_scene.instantiate()
+		if BLOCK_SCENE:
+			var block = BLOCK_SCENE.instantiate()
 			get_tree().root.add_child(block)
 			block.global_position = snapped_pos
 
