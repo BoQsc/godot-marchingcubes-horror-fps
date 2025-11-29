@@ -24,7 +24,7 @@ func _ready():
 	mat.shader = TERRAIN_SHADER
 	mat.set_shader_parameter("grass_texture", GRASS_TEXTURE)
 	mat.set_shader_parameter("road_texture", ROAD_TEXTURE)
-	mat.set_shader_parameter("texture_scale", 0.1)
+	mat.set_shader_parameter("texture_scale", 1)
 	self.material_override = mat
 
 # Threading & Synchronization
