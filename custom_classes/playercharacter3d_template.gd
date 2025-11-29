@@ -1,5 +1,5 @@
 @tool
-class_name PlayerCharacter3D
+class_name PlayerCharacter3DTemplate
 extends CharacterBody3D
 
 func _ready() -> void:

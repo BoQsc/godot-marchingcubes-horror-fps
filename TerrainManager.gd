@@ -103,7 +103,7 @@ func process_generation_queue():
 func _on_chunk_generation_complete(_coord):
 	current_active_tasks -= 1
 
-func modify_terrain(global_pos: Vector3, amount: float):
+func modify_terrain(global_pos: Vector3, amount: float, shape: String = "sphere"):
 	var chunk_world_size = grid_size * scale_factor
 	var radius = 3.0 # The radius used for digging
 	
@@ -119,4 +119,4 @@ func modify_terrain(global_pos: Vector3, amount: float):
 			if active_chunks.has(coord):
 				var chunk = active_chunks[coord]
 				var local_pos = global_pos - chunk.global_position
-				chunk.modify_terrain(local_pos, radius, amount)
+				chunk.modify_terrain(local_pos, radius, amount, shape)

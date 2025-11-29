@@ -50,7 +50,11 @@ func start_generation(p_chunk_coord, p_grid_size, p_iso_level, p_scale_factor, p
 	thread = Thread.new()
 	thread.start(_generate.bind(thread))
 
-func modify_terrain(local_pos: Vector3, radius: float, amount: float):
+func modify_terrain(local_pos: Vector3, radius: float, amount: float, shape: String = "sphere"):
+	# Wait for any existing generation to finish BEFORE touching data
+	if thread and thread.is_started():
+		thread.wait_to_finish()
+
 	# Convert local position (scaled) to grid coordinates
 	var center_x = local_pos.x / scale_factor
 	var center_y = local_pos.y / scale_factor
@@ -74,16 +78,26 @@ func modify_terrain(local_pos: Vector3, radius: float, amount: float):
 		for x in range(min_x, max_x + 1):
 			for y in range(min_y, max_y + 1):
 				for z in range(min_z, max_z + 1):
-					var dist_sq = (x - center_x)**2 + (y - center_y)**2 + (z - center_z)**2
-					if dist_sq <= r_sq:
+					var hit = false
+					if shape == "sphere":
+						var dist_sq = (x - center_x)**2 + (y - center_y)**2 + (z - center_z)**2
+						if dist_sq <= r_sq:
+							hit = true
+					elif shape == "box":
+						# For box, we are already inside the bounding loop, so mostly hit.
+						# But let's be precise with the radius (half-extent)
+						if abs(x - center_x) <= (radius / scale_factor) and \
+						   abs(y - center_y) <= (radius / scale_factor) and \
+						   abs(z - center_z) <= (radius / scale_factor):
+							hit = true
+					
+					if hit:
 						var idx = x * s2 + y * s + z
 						field[idx] += amount
 						modified = true
 	mutex.unlock()
 
 	if modified:
-		if thread and thread.is_started():
-			thread.wait_to_finish()
 		thread = Thread.new()
 		thread.start(_generate.bind(thread))
 
