@@ -23,8 +23,16 @@ glow_enabled = true
 script/source = "extends CharacterBody3D
 
 # --- Settings ---
-@export var move_speed: float = 0.1  # Updated as requested
-@export var gravity: float = 2.0     # Updated as requested
+# SPEED: Set this to 1.0 or 1.5. 
+# If he is still too fast, lower this to 0.5.
+@export var move_speed: float = 1.0 
+
+# GRAVITY: Standard Earth gravity (9.8).
+@export var gravity: float = 9.8 
+
+# FRICTION: High value (10.0) stops him immediately when he goes to IDLE.
+# Prevents \"ice sliding\".
+@export var friction: float = 10.0 
 
 # --- References ---
 @onready var anim_player = $\"Sketchfab_Scene zombie\".find_child(\"AnimationPlayer\")
@@ -43,12 +51,11 @@ func _ready():
 	wall_detector.enabled = true
 	wall_detector.add_exception(self) 
 	
-	# MOVEMENT FIX: Point the nose to Positive Z (since we inverted movement)
+	# Point the nose to Positive Z
 	wall_detector.target_position = Vector3(0, 0, 1.0) 
 
 	# 2. START ANIMATION LOOP
 	if anim_player:
-		# Play the master file once, we control the loop manually below
 		anim_player.play(\"Take 001\")
 		if anim_player.has_animation(\"Take 001\"):
 			anim_player.get_animation(\"Take 001\").loop_mode = Animation.LOOP_LINEAR
@@ -65,24 +72,20 @@ func _physics_process(delta):
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
-	# 2. Manual Animation Slicing (0-1s Idle, 1-2s Walk)
+	# 2. Animation Slicing
 	if anim_player:
 		var current_time = anim_player.current_animation_position
-		
 		match current_state:
 			\"IDLE\":
-				# Loop 0.0 to 1.0
-				if current_time >= 1.0:
-					anim_player.seek(0.0)
+				if current_time >= 1.0: anim_player.seek(0.0)
 			\"WALK\":
-				# Loop 1.0 to 2.0
-				if current_time >= 2.0 or current_time < 1.0:
-					anim_player.seek(1.0)
+				if current_time >= 2.0 or current_time < 1.0: anim_player.seek(1.0)
 
 	# 3. Movement Logic
 	if current_state == \"IDLE\":
-		velocity.x = move_toward(velocity.x, 0, move_speed * delta)
-		velocity.z = move_toward(velocity.z, 0, move_speed * delta)
+		# BRAKING: Use friction to stop quickly
+		velocity.x = move_toward(velocity.x, 0, friction * delta)
+		velocity.z = move_toward(velocity.z, 0, friction * delta)
 		
 		wander_timer -= delta
 		if wander_timer <= 0:
@@ -90,9 +93,9 @@ func _physics_process(delta):
 			change_state(\"WALK\")
 			
 	elif current_state == \"WALK\":
-		# MOVEMENT FIX: Removed the \"-\" sign. 
-		# Now using Positive Z (transform.basis.z) to inverse movement.
-		var forward_dir = transform.basis.z 
+		# CRITICAL FIX: .normalized() removes the effect of the model's scale.
+		# Now, he moves exactly 1 meter per second (if move_speed is 1.0).
+		var forward_dir = transform.basis.z.normalized()
 		
 		velocity.x = forward_dir.x * move_speed
 		velocity.z = forward_dir.z * move_speed
@@ -120,7 +123,6 @@ func change_state(new_state):
 		wander_timer = randf_range(3.0, 6.0) 
 
 func pick_random_direction():
-	# Rotates the whole body. Since velocity uses basis.z, he moves where he looks.
 	var random_turn = deg_to_rad(randf_range(90, 270)) 
 	rotate_y(random_turn)
 
