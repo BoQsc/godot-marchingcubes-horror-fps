@@ -23,6 +23,7 @@ func _ready():
 	mat.uv1_triplanar = true
 	mat.uv1_world_triplanar = true
 	mat.roughness = 0.8
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED # Fix seeing through mesh
 	self.material_override = mat
 
 # Threading & Synchronization
@@ -177,6 +178,12 @@ func _generate(thread_ref):
 func _finalize_mesh(new_mesh, thread_ref):
 	thread_ref.wait_to_finish()
 	self.mesh = new_mesh
+	
+	# Clear old collision shapes to prevent stacking/ghost collisions
+	for child in get_children():
+		if child is StaticBody3D:
+			child.queue_free()
+			
 	create_trimesh_collision()
 	generation_complete.emit(chunk_coord)
 
