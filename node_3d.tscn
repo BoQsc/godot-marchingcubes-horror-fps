@@ -857,7 +857,14 @@ offset_bottom = 40.0
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
-text = "Best game 3 
+text = "Best game 3 - Press ESC for Main Menu"
+
+[node name="Label2" type="Label" parent="PlayerCharacter3D/CanvasLayer/Control"]
+visible = false
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = " 
 
 
                              Mouse Controls
