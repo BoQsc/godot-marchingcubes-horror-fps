@@ -1,12 +1,46 @@
-[gd_scene load_steps=23 format=3 uid="uid://c2pp8ci31jce2"]
+[gd_scene load_steps=26 format=3 uid="uid://c2pp8ci31jce2"]
 
 [ext_resource type="AudioStream" uid="uid://i6o3hrbi2ac2" path="res://music/mysterious-dark-background-310162.mp3" id="1_i5arm"]
+[ext_resource type="PackedScene" uid="uid://ceaj1g6o3ms5k" path="res://props/grass/grass.glb" id="1_jsk3o"]
 [ext_resource type="Script" path="res://Player.gd" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://bsiwysbjrs4v6" path="res://props/rigged_animated_cinematic_quality_tree_4.glb" id="1_wc5p8"]
 [ext_resource type="Script" uid="uid://duyja5u7s3uww" path="res://TerrainManager.gd" id="2_terrain"]
 [ext_resource type="PackedScene" uid="uid://b8j2q4x5y607" path="res://MarchingCubesChunk.tscn" id="3_chunk"]
 [ext_resource type="PackedScene" uid="uid://o6xj2jdgavj" path="res://male_zombie.glb" id="3_jka67"]
 [ext_resource type="PackedScene" uid="uid://1xh5cq6f56t3" path="res://heavy_pistol_animated.glb" id="4_r3fl7"]
+
+[sub_resource type="GDScript" id="GDScript_4arys"]
+script/source = "extends CharacterBody3D
+
+# --- Settings ---
+@export var gravity: float = 9.8
+
+
+
+func _physics_process(delta):
+	# 1. Gravity
+	# We keep gravity so the tree sits properly on the ground/mesh
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+	else:
+		velocity.y = -0.1 # Keep glued to floor to prevent micro-bouncing
+
+	# 2. Ensure No Horizontal Movement
+	# We explicitly zero this out to ensure it never slides
+	velocity.x = 0
+	velocity.z = 0
+
+	# 3. Apply Physics
+	move_and_slide()
+	
+	# Void Safety
+	# If the map accidentally disappears or the tree falls through
+	if global_position.y < -50:
+		velocity = Vector3.ZERO
+		global_position = Vector3(0, 5, 0)
+"
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4arys"]
 
 [sub_resource type="GDScript" id="GDScript_jsk3o"]
 script/source = "extends CharacterBody3D
@@ -541,45 +575,6 @@ func _play_random_sound():
 	play()
 "
 
-[sub_resource type="GDScript" id="GDScript_toolbelt"]
-script/source = "extends Control
-
-var current_slot = 0
-@onready var container = $HBoxContainer
-
-func _ready():
-	update_visuals()
-
-func _input(event):
-	if event is InputEventMouseButton and event.pressed:
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			current_slot = (current_slot - 1 + 9) % 9
-			update_visuals()
-		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			current_slot = (current_slot + 1) % 9
-			update_visuals()
-	
-	# Supports number keys 1-9
-	if event is InputEventKey and event.pressed:
-		if event.keycode >= KEY_1 and event.keycode <= KEY_9:
-			current_slot = event.keycode - KEY_1
-			update_visuals()
-
-func update_visuals():
-	if not container: return
-	
-	for i in range(container.get_child_count()):
-		var slot = container.get_child(i)
-		var border = slot.get_node_or_null(\"Border\")
-		
-		if i == current_slot:
-			slot.color = Color(0.3, 0.3, 0.3, 0.9) # Light up active slot
-			if border: border.visible = true
-		else:
-			slot.color = Color(0.1, 0.1, 0.1, 0.6) # Dim inactive slots
-			if border: border.visible = false
-"
-
 [sub_resource type="GDScript" id="GDScript_compass"]
 script/source = "extends Control
 
@@ -666,7 +661,56 @@ func advance_time():
 	text = \"Day %d    %02d:%02d\" % [day, hour, minute]
 "
 
+[sub_resource type="GDScript" id="GDScript_toolbelt"]
+script/source = "extends Control
+
+var current_slot = 0
+@onready var container = $HBoxContainer
+
+func _ready():
+	update_visuals()
+
+func _input(event):
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			current_slot = (current_slot - 1 + 9) % 9
+			update_visuals()
+		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			current_slot = (current_slot + 1) % 9
+			update_visuals()
+	
+	# Supports number keys 1-9
+	if event is InputEventKey and event.pressed:
+		if event.keycode >= KEY_1 and event.keycode <= KEY_9:
+			current_slot = event.keycode - KEY_1
+			update_visuals()
+
+func update_visuals():
+	if not container: return
+	
+	for i in range(container.get_child_count()):
+		var slot = container.get_child(i)
+		var border = slot.get_node_or_null(\"Border\")
+		
+		if i == current_slot:
+			slot.color = Color(0.3, 0.3, 0.3, 0.9) # Light up active slot
+			if border: border.visible = true
+		else:
+			slot.color = Color(0.1, 0.1, 0.1, 0.6) # Dim inactive slots
+			if border: border.visible = false
+"
+
 [node name="Node3D" type="Node3D"]
+
+[node name="CharacterBody3D plants" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 36.99212, 14.369799)
+script = SubResource("GDScript_4arys")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D plants"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0881653, 0)
+shape = SubResource("CapsuleShape3D_4arys")
+
+[node name="Sketchfab_Scene" parent="CharacterBody3D plants" instance=ExtResource("1_jsk3o")]
 
 [node name="CharacterBody3D4 its a tree" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.442642, 54.100525, 0)
