@@ -13,6 +13,19 @@
 [ext_resource type="Script" uid="uid://cdnnqwu84x4af" path="res://ui/HUDCompassBar.tres.gd" id="8_tereu"]
 [ext_resource type="Script" uid="uid://fdhxaetxv7my" path="res://ui/HUDToolbelt.tres.gd" id="9_cdqbm"]
 
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4xowi"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_a202f"]
+sky_material = SubResource("ProceduralSkyMaterial_4xowi")
+
+[sub_resource type="Environment" id="Environment_noarx"]
+background_mode = 2
+sky = SubResource("Sky_a202f")
+tonemap_mode = 2
+glow_enabled = true
+
 [sub_resource type="GDScript" id="GDScript_4arys"]
 script/source = "extends CharacterBody3D
 
@@ -98,19 +111,6 @@ func _physics_process(delta):
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_wc5p8"]
 radius = 0.6
 height = 3.0
-
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4xowi"]
-sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
-ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
-
-[sub_resource type="Sky" id="Sky_a202f"]
-sky_material = SubResource("ProceduralSkyMaterial_4xowi")
-
-[sub_resource type="Environment" id="Environment_noarx"]
-background_mode = 2
-sky = SubResource("Sky_a202f")
-tonemap_mode = 2
-glow_enabled = true
 
 [sub_resource type="GDScript" id="GDScript_i5arm"]
 script/source = "extends CharacterBody3D
@@ -614,6 +614,18 @@ func _play_random_sound():
 
 [node name="Node3D" type="Node3D"]
 
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("1_i5arm")
+autoplay = true
+parameters/looping = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_noarx")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
 [node name="Node3D props" type="Node3D" parent="."]
 
 [node name="CharacterBody3D plants" type="CharacterBody3D" parent="Node3D props"]
@@ -689,18 +701,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -23.931396, 0)
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D props/CharacterBody3D4 its a tree"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.069963455, -22.431944, -0.14442936)
 shape = SubResource("CapsuleShape3D_wc5p8")
-
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("1_i5arm")
-autoplay = true
-parameters/looping = true
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_noarx")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
-shadow_enabled = true
 
 [node name="TerrainManager" type="Node3D" parent="." node_paths=PackedStringArray("player")]
 script = ExtResource("2_terrain")
