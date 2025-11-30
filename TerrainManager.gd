@@ -4,9 +4,9 @@ extends Node3D
 @export var player: Node3D # Assign your Player node here
 
 @export_group("Settings")
-@export var render_distance: int = 8 # Increased default
-@export var chunks_per_frame: int = 8 # Process multiple chunks per frame
-@export var max_concurrent_tasks: int = 8 # Limit threads to prevent freezing
+@export var render_distance: int = 6 # Reduced from 8 to reduce initial load spike
+@export var chunks_per_frame: int = 1 # Only start 1 chunk per frame to prevent stutter
+@export var max_concurrent_tasks: int = 3 # Reduced from 8 to prevent CPU starvation
 @export var grid_size: int = 32
 @export var scale_factor: float = 1.0
 @export var terrain_height: float = 30.0
@@ -16,6 +16,7 @@ var active_chunks = {} # Key: Vector3i, Value: Chunk Instance
 var chunks_in_queue = {} # Key: Vector3i, Value: true (Fast lookup)
 var chunks_to_generate = [] # Array of Vector3i for ordering
 var current_active_tasks: int = 0
+var last_chunk_coord: Vector3i = Vector3i(999999, 999999, 999999)
 
 func _ready():
 	noise.seed = randi()
@@ -35,6 +36,11 @@ func update_chunks():
 	var current_chunk_x = int(floor(p_pos.x / chunk_world_size))
 	var current_chunk_z = int(floor(p_pos.z / chunk_world_size))
 	var current_coord = Vector3i(current_chunk_x, 0, current_chunk_z)
+	
+	if current_coord == last_chunk_coord:
+		return
+	
+	last_chunk_coord = current_coord
 	
 	# 1. Identify chunks that should exist
 	var target_chunks = {}
@@ -73,8 +79,13 @@ func update_chunks():
 func process_generation_queue():
 	if chunks_to_generate.is_empty(): return
 	
-	# Only start new tasks if we have capacity
-	while current_active_tasks < max_concurrent_tasks and not chunks_to_generate.is_empty():
+	var started_this_frame = 0
+	
+	# Only start new tasks if we have capacity AND haven't exceeded per-frame limit
+	while current_active_tasks < max_concurrent_tasks and \
+		  not chunks_to_generate.is_empty() and \
+		  started_this_frame < chunks_per_frame:
+			
 		var coord = chunks_to_generate.pop_front()
 		chunks_in_queue.erase(coord) # Remove from queue lookup
 		
@@ -93,6 +104,7 @@ func process_generation_queue():
 		# Connect signal to release task slot
 		chunk.generation_complete.connect(_on_chunk_generation_complete)
 		current_active_tasks += 1
+		started_this_frame += 1
 		
 		# Store reference
 		active_chunks[coord] = chunk

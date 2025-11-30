@@ -32,6 +32,7 @@ var thread: Thread
 var mutex: Mutex = Mutex.new()
 var field: PackedFloat32Array
 var road_data: PackedFloat32Array
+var dirty: bool = false # Flag to track if data changed while generating
 
 func _exit_tree():
 	if thread and thread.is_started():
@@ -53,10 +54,6 @@ func start_generation(p_chunk_coord, p_grid_size, p_iso_level, p_scale_factor, p
 	thread.start(_generate.bind(thread))
 
 func modify_terrain(local_pos: Vector3, radius: float, amount: float, shape: String = "sphere"):
-	# Wait for any existing generation to finish BEFORE touching data
-	if thread and thread.is_started():
-		thread.wait_to_finish()
-
 	# Convert local position (scaled) to grid coordinates
 	var center_x = local_pos.x / scale_factor
 	var center_y = local_pos.y / scale_factor
@@ -72,8 +69,6 @@ func modify_terrain(local_pos: Vector3, radius: float, amount: float, shape: Str
 	var max_y = int(min(grid_size, center_y + radius))
 	var min_z = int(max(0, center_z - radius))
 	var max_z = int(min(grid_size, center_z + radius))
-	
-	var modified = false
 	
 	mutex.lock()
 	if field.size() == s*s*s:
@@ -94,17 +89,18 @@ func modify_terrain(local_pos: Vector3, radius: float, amount: float, shape: Str
 					if hit:
 						var idx = x * s2 + y * s + z
 						field[idx] += amount
-						modified = true
+						dirty = true
 	mutex.unlock()
 
-	if modified:
+	# Only start if idle. If running, _finalize_mesh will catch the 'dirty' flag and restart.
+	if dirty and (not thread or not thread.is_started()):
+		if thread:
+			thread.wait_to_finish() # Clean up finished thread
 		thread = Thread.new()
 		thread.start(_generate.bind(thread))
+		dirty = false
 
 func modify_road(local_pos: Vector3, radius: float, amount: float):
-	if thread and thread.is_started():
-		thread.wait_to_finish()
-
 	var center_x = local_pos.x / scale_factor
 	var center_y = local_pos.y / scale_factor
 	var center_z = local_pos.z / scale_factor
@@ -120,8 +116,6 @@ func modify_road(local_pos: Vector3, radius: float, amount: float):
 	var min_z = int(max(0, center_z - radius))
 	var max_z = int(min(grid_size, center_z + radius))
 	
-	var modified = false
-	
 	mutex.lock()
 	# Ensure road data exists (it should if generated, but check size)
 	if road_data.size() == s*s*s:
@@ -132,12 +126,16 @@ func modify_road(local_pos: Vector3, radius: float, amount: float):
 					if dist_sq <= r_sq:
 						var idx = x * s2 + y * s + z
 						road_data[idx] = clamp(road_data[idx] + amount, 0.0, 1.0)
-						modified = true
+						dirty = true
 	mutex.unlock()
 
-	if modified:
+	# Only start if idle.
+	if dirty and (not thread or not thread.is_started()):
+		if thread:
+			thread.wait_to_finish()
 		thread = Thread.new()
 		thread.start(_generate.bind(thread))
+		dirty = false
 
 func _generate(thread_ref):
 	var st = SurfaceTool.new()
@@ -171,6 +169,14 @@ func _generate(thread_ref):
 	mutex.unlock()
 
 	# Standard Marching Cubes
+	
+	# Pre-allocate arrays to reduce GC pressure
+	var corners = [Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO]
+	var vert_list = []
+	vert_list.resize(12)
+	var color_list = []
+	color_list.resize(12)
+	
 	for x in range(grid_size):
 		for y in range(grid_size):
 			for z in range(grid_size):
@@ -201,18 +207,15 @@ func _generate(thread_ref):
 				
 				if EDGE_TABLE[cube_index] == 0: continue
 				
-				var corners = [
-					Vector3(x, y, z), Vector3(x+1, y, z), Vector3(x+1, y, z+1), Vector3(x, y, z+1),
-					Vector3(x, y+1, z), Vector3(x+1, y+1, z), Vector3(x+1, y+1, z+1), Vector3(x, y+1, z+1)
-				]
-				
-				var vert_list = []
-				vert_list.resize(12)
-				var color_list = []
-				color_list.resize(12)
-				
-				# Helper lambda for vertex interpolation with color
-				# Not actually using a lambda because of GDScript version potential issues, just inline logic
+				# Update corners in-place
+				corners[0] = Vector3(x, y, z)
+				corners[1] = Vector3(x+1, y, z)
+				corners[2] = Vector3(x+1, y, z+1)
+				corners[3] = Vector3(x, y, z+1)
+				corners[4] = Vector3(x, y+1, z)
+				corners[5] = Vector3(x+1, y+1, z)
+				corners[6] = Vector3(x+1, y+1, z+1)
+				corners[7] = Vector3(x, y+1, z+1)
 				
 				# Edge 0: 0 -> 1
 				if (EDGE_TABLE[cube_index] & 1): 
@@ -299,19 +302,42 @@ func _generate(thread_ref):
 	st.index()
 	st.generate_normals()
 	
-	call_deferred("_finalize_mesh", st.commit(), thread_ref)
-
-func _finalize_mesh(new_mesh, thread_ref):
-	thread_ref.wait_to_finish()
-	self.mesh = new_mesh
+	var final_mesh = st.commit()
 	
-	# Clear old collision shapes to prevent stacking/ghost collisions
-	for child in get_children():
-		if child is StaticBody3D:
-			child.queue_free()
+	# Generate Collision Shape in Thread (Massive performance win)
+	var shape = final_mesh.create_trimesh_shape()
+	
+	call_deferred("_finalize_mesh", final_mesh, shape, thread_ref)
+
+func _finalize_mesh(new_mesh, new_shape, thread_ref):
+	# If this is the active thread, join it and potentially restart
+	if thread == thread_ref:
+		thread.wait_to_finish()
+		thread = null
+		
+		self.mesh = new_mesh
+		# Clear old collision shapes to prevent stacking/ghost collisions
+		for child in get_children():
+			if child is StaticBody3D:
+				child.queue_free()
+		
+		var sb = StaticBody3D.new()
+		var cs = CollisionShape3D.new()
+		cs.shape = new_shape
+		sb.add_child(cs)
+		add_child(sb)
+		
+		if dirty:
+			dirty = false
+			thread = Thread.new()
+			thread.start(_generate.bind(thread))
+		else:
+			generation_complete.emit(chunk_coord)
 			
-	create_trimesh_collision()
-	generation_complete.emit(chunk_coord)
+	else:
+		# This is an old thread (cancelled/replaced), just clean it up
+		if thread_ref.is_started():
+			thread_ref.wait_to_finish()
 
 func vertex_interp(isolevel: float, p1: Vector3, p2: Vector3, val_p1: float, val_p2: float) -> Vector3:
 	if abs(isolevel - val_p1) < 0.00001: return p1
