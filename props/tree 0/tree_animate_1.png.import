@@ -2,35 +2,34 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dspqf1vdmooo3"
-path.s3tc="res://.godot/imported/tree_animate_2.png-3160b6017d5c3f35db605a38a73c7aa9.s3tc.ctex"
+uid="uid://c4hgades3jjwt"
+path="res://.godot/imported/tree_animate_1.png-aaa1ce73863c40212b94f73fbbf82314.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 generator_parameters={
-"md5": "0ca77d38496b325be27ed5f5e5dd5f07"
+"md5": "3ecdca228603b9e4f66d1048b62a0842"
 }
 
 [deps]
 
-source_file="res://props/tree_animate_2.png"
-dest_files=["res://.godot/imported/tree_animate_2.png-3160b6017d5c3f35db605a38a73c7aa9.s3tc.ctex"]
+source_file="res://props/tree 0/tree_animate_1.png"
+dest_files=["res://.godot/imported/tree_animate_1.png-aaa1ce73863c40212b94f73fbbf82314.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=1
+compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=1
-roughness/src_normal="res://props/tree_animate_2.png"
+roughness/mode=0
+roughness/src_normal=""
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2
@@ -41,4 +40,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1
