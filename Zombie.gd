@@ -43,6 +43,7 @@ func _ready():
 	set_physics_process(false)
 	await get_tree().create_timer(0.5).timeout
 	set_physics_process(true)
+	
 	change_state("IDLE")
 
 func find_skeleton(node: Node) -> Skeleton3D:
@@ -63,15 +64,21 @@ func _physics_process(delta):
 	else:
 		velocity.y = -0.1
 
-	# Animation Loop Logic
+	# --- ANIMATION LOGIC (Restored) ---
 	if anim_player:
 		var t = anim_player.current_animation_position
+		
 		if current_state == "IDLE":
 			if t >= 1.0: anim_player.seek(t - 1.0)
-		elif current_state == "WALK":
+			
+		elif current_state == "WALK" or current_state == "CHASE":
 			if t >= 2.0: anim_player.seek(1.0 + (t - 2.0))
+			
+		elif current_state == "ATTACK":
+			# Attack Slice: 3.5s to 4.5s
+			if t >= 4.5: anim_player.seek(3.5 + (t - 4.5))
 
-	# Movement Logic
+	# --- MOVEMENT LOGIC ---
 	if current_state == "IDLE":
 		velocity.x = move_toward(velocity.x, 0, friction * delta)
 		velocity.z = move_toward(velocity.z, 0, friction * delta)
@@ -81,7 +88,6 @@ func _physics_process(delta):
 			pick_random_direction()
 			change_state("WALK")
 			
-		# Check for player
 		var player = get_node_or_null("/root/Node3D/PlayerCharacter3D")
 		if player and global_position.distance_to(player.global_position) < 15.0:
 			change_state("CHASE")
@@ -97,7 +103,6 @@ func _physics_process(delta):
 		if (wd and wd.is_colliding()) or wander_timer <= 0:
 			change_state("IDLE")
 			
-		# Check for player
 		var player = get_node_or_null("/root/Node3D/PlayerCharacter3D")
 		if player and global_position.distance_to(player.global_position) < 15.0:
 			change_state("CHASE")
@@ -107,33 +112,32 @@ func _physics_process(delta):
 		if player:
 			var dist = global_position.distance_to(player.global_position)
 			if dist > 20.0:
-				change_state("IDLE") # Lost him
+				change_state("IDLE")
 			elif dist < 1.5:
-				# Attack Range
+				change_state("ATTACK")
+			else:
+				look_at(Vector3(player.global_position.x, global_position.y, player.global_position.z), Vector3.UP)
+				rotate_y(PI)
+				
+				var dir = (player.global_position - global_position).normalized()
+				velocity.x = dir.x * (move_speed * 2.5)
+				velocity.z = dir.z * (move_speed * 2.5)
+	
+	elif current_state == "ATTACK":
+		var player = get_node_or_null("/root/Node3D/PlayerCharacter3D")
+		if player:
+			var dist = global_position.distance_to(player.global_position)
+			if dist > 2.5:
+				change_state("CHASE")
+			else:
+				look_at(Vector3(player.global_position.x, global_position.y, player.global_position.z), Vector3.UP)
+				rotate_y(PI)
 				velocity = Vector3.ZERO
+				
 				attack_timer -= delta
 				if attack_timer <= 0:
 					attack(player)
 					attack_timer = 1.0
-			else:
-				# Run towards player
-				look_at(Vector3(player.global_position.x, global_position.y, player.global_position.z), Vector3.UP)
-				# Rotating 180 because model might be facing wrong way? 
-				# The wander logic uses +Z as forward. `look_at` points -Z towards target.
-				# Let's assume standard Godot: -Z is forward.
-				# If wander logic `transform.basis.z` works, then Z is forward?
-				# Actually, `look_at` points -Z. 
-				# Let's check model. Usually mixamo is +Z.
-				rotate_y(PI) # Fix rotation if needed
-				
-				var dir = (player.global_position - global_position).normalized()
-				velocity.x = dir.x * (move_speed * 2.5) # Run fast
-				velocity.z = dir.z * (move_speed * 2.5)
-				
-				if anim_player:
-					# Speed up animation for running?
-					if anim_player.current_animation == "Take 001":
-						pass # It's the only animation we have
 
 	move_and_slide()
 	
@@ -149,6 +153,7 @@ func change_state(new_state):
 	if anim_player:
 		if new_state == "IDLE": anim_player.seek(0.0)
 		if new_state == "WALK": anim_player.seek(1.0)
+		if new_state == "ATTACK": anim_player.seek(3.5)
 		
 	if new_state == "IDLE": wander_timer = randf_range(2.0, 4.0)
 	if new_state == "WALK": wander_timer = randf_range(3.0, 6.0)
