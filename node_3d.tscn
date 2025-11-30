@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://bhm7fy0qu42qg" path="res://props/grass plants/1/tropical_plant_2.glb" id="2_4arys"]
 [ext_resource type="Script" uid="uid://duyja5u7s3uww" path="res://TerrainManager.gd" id="2_terrain"]
 [ext_resource type="PackedScene" uid="uid://b8j2q4x5y607" path="res://MarchingCubesChunk.tscn" id="3_chunk"]
-[ext_resource type="PackedScene" uid="uid://o6xj2jdgavj" path="res://male_zombie.glb" id="3_jka67"]
+[ext_resource type="PackedScene" uid="uid://o6xj2jdgavj" path="res://models/zombie/male_zombie.glb" id="3_jka67"]
 [ext_resource type="PackedScene" uid="uid://1xh5cq6f56t3" path="res://models/pistol/heavy_pistol_animated.glb" id="4_r3fl7"]
 [ext_resource type="Script" uid="uid://dn62uutrsxi6o" path="res://ui/ESCMainMenu.tres.gd" id="8_6iypd"]
 [ext_resource type="Script" uid="uid://cdnnqwu84x4af" path="res://ui/HUDCompassBar.tres.gd" id="8_tereu"]

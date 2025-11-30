@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://o6xj2jdgavj"
-path="res://.godot/imported/male_zombie.glb-2374617a5592f7505108aaa69e31372e.scn"
+path="res://.godot/imported/male_zombie.glb-259bb59894c46a578eeb62fa4fd6f20a.scn"
 
 [deps]
 
-source_file="res://male_zombie.glb"
-dest_files=["res://.godot/imported/male_zombie.glb-2374617a5592f7505108aaa69e31372e.scn"]
+source_file="res://models/zombie/male_zombie.glb"
+dest_files=["res://.godot/imported/male_zombie.glb-259bb59894c46a578eeb62fa4fd6f20a.scn"]
 
 [params]
 
