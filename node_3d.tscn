@@ -93,6 +93,8 @@ func _physics_process(delta):
 "
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_wc5p8"]
+radius = 0.6
+height = 3.0
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4xowi"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -805,7 +807,7 @@ script = SubResource("GDScript_jsk3o")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -23.931396, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D4 its a tree"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -23.115135, -0.13289416)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.069963455, -22.431944, -0.14442936)
 shape = SubResource("CapsuleShape3D_wc5p8")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
