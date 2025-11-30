@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://ceaj1g6o3ms5k"
-path="res://.godot/imported/grass.glb-fadb408cb48b9805d9d7f895923a9157.scn"
+uid="uid://bhm7fy0qu42qg"
+path="res://.godot/imported/tropical_plant_2.glb-5cc4cc371d7ec423892333fddc84a7ea.scn"
 
 [deps]
 
-source_file="res://props/grass/grass.glb"
-dest_files=["res://.godot/imported/grass.glb-fadb408cb48b9805d9d7f895923a9157.scn"]
+source_file="res://props/grass plants 1/1/tropical_plant_2.glb"
+dest_files=["res://.godot/imported/tropical_plant_2.glb-5cc4cc371d7ec423892333fddc84a7ea.scn"]
 
 [params]
 

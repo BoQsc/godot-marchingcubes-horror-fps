@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://df53iue7nr5es"
-path.s3tc="res://.godot/imported/tropical_plant_2_5.png-422fd7da6de1ce7b48c17b75a5d09478.s3tc.ctex"
+uid="uid://7cscbmx4w085"
+path.s3tc="res://.godot/imported/tropical_plant_2_3.png-7b3787d8223a80f9182dedb5f6d1b646.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "65e44eef08b2cd22c1da66796cae3d29"
+"md5": "5df1c05e85298bf49b3bc0bebfcca101"
 }
 
 [deps]
 
-source_file="res://props/grass plants/1/tropical_plant_2_5.png"
-dest_files=["res://.godot/imported/tropical_plant_2_5.png-422fd7da6de1ce7b48c17b75a5d09478.s3tc.ctex"]
+source_file="res://props/grass plants 1/1/tropical_plant_2_3.png"
+dest_files=["res://.godot/imported/tropical_plant_2_3.png-7b3787d8223a80f9182dedb5f6d1b646.s3tc.ctex"]
 
 [params]
 
@@ -25,12 +25,12 @@ compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=1
+compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=1
-roughness/src_normal="res://props/grass plants/1/tropical_plant_2_5.png"
+roughness/mode=0
+roughness/src_normal=""
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

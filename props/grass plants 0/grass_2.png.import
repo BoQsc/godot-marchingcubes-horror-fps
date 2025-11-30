@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cgwa1h0qq30r3"
-path.s3tc="res://.godot/imported/tropical_plant_2_0.png-caa703854281134c76fb94d9714137ea.s3tc.ctex"
+uid="uid://4g3171ooib8t"
+path.s3tc="res://.godot/imported/grass_2.png-869eeab15df8c46413fcfd8eb67f221e.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "8df8feb279a7d47b549cb3d60a854fbc"
+"md5": "569e7ebb8a85cafdf8c8260d0545acfc"
 }
 
 [deps]
 
-source_file="res://props/grass plants/1/tropical_plant_2_0.png"
-dest_files=["res://.godot/imported/tropical_plant_2_0.png-caa703854281134c76fb94d9714137ea.s3tc.ctex"]
+source_file="res://props/grass plants 0/grass_2.png"
+dest_files=["res://.godot/imported/grass_2.png-869eeab15df8c46413fcfd8eb67f221e.s3tc.ctex"]
 
 [params]
 

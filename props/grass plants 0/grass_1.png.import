@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://4g3171ooib8t"
-path.s3tc="res://.godot/imported/grass_2.png-be772651e2412c5e5d14840f02101bf8.s3tc.ctex"
+uid="uid://b21qxd1j6vmfe"
+path.s3tc="res://.godot/imported/grass_1.png-1470b3db7072e185c8c235f5723ca208.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "569e7ebb8a85cafdf8c8260d0545acfc"
+"md5": "8b41860bf4d9e9ddc32c17d14a34b801"
 }
 
 [deps]
 
-source_file="res://props/grass/grass_2.png"
-dest_files=["res://.godot/imported/grass_2.png-be772651e2412c5e5d14840f02101bf8.s3tc.ctex"]
+source_file="res://props/grass plants 0/grass_1.png"
+dest_files=["res://.godot/imported/grass_1.png-1470b3db7072e185c8c235f5723ca208.s3tc.ctex"]
 
 [params]
 
@@ -25,12 +25,12 @@ compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=0
+compress/normal_map=1
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=0
-roughness/src_normal=""
+roughness/mode=1
+roughness/src_normal="res://props/grass/grass_1.png"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2
