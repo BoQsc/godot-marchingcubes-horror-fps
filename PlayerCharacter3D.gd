@@ -10,8 +10,21 @@ const WATER_LEVEL = 15.0
 
 @onready var camera = $Camera3D
 
+var environment: Environment
+var original_fog_enabled: bool = false
+var original_fog_color: Color
+var original_fog_density: float
+
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	
+	# Get the WorldEnvironment from the scene root
+	var world_env = get_node("/root/Node3D/WorldEnvironment")
+	if world_env and world_env.environment:
+		environment = world_env.environment
+		original_fog_enabled = environment.fog_enabled
+		original_fog_color = environment.fog_light_color
+		original_fog_density = environment.fog_density
 
 func _unhandled_input(event):
 	if event is InputEventMouseMotion:
@@ -30,8 +43,16 @@ func _physics_process(delta):
 	
 	if is_underwater:
 		handle_swimming(delta)
+		if environment:
+			environment.fog_enabled = true
+			environment.fog_light_color = Color(0.0, 0.1, 0.4) # Deep Blue
+			environment.fog_density = 0.05 # Thick water
 	else:
 		handle_walking(delta)
+		if environment:
+			environment.fog_enabled = original_fog_enabled
+			environment.fog_light_color = original_fog_color
+			environment.fog_density = original_fog_density
 
 	move_and_slide()
 
