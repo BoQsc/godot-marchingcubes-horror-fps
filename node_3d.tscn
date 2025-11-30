@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://b8j2q4x5y607" path="res://MarchingCubesChunk.tscn" id="3_chunk"]
 [ext_resource type="PackedScene" uid="uid://o6xj2jdgavj" path="res://models/zombie/male_zombie.glb" id="3_jka67"]
 [ext_resource type="PackedScene" uid="uid://1xh5cq6f56t3" path="res://models/pistol/heavy_pistol_animated.glb" id="4_r3fl7"]
+[ext_resource type="Script" path="res://Zombie.gd" id="5_zombie"]
 [ext_resource type="Script" uid="uid://dn62uutrsxi6o" path="res://ui/ESCMainMenu.tres.gd" id="8_6iypd"]
 [ext_resource type="Script" uid="uid://cdnnqwu84x4af" path="res://ui/HUDCompassBar.tres.gd" id="8_tereu"]
 [ext_resource type="Script" uid="uid://fdhxaetxv7my" path="res://ui/HUDToolbelt.tres.gd" id="9_cdqbm"]
@@ -707,9 +708,9 @@ script = ExtResource("2_terrain")
 chunk_scene = ExtResource("3_chunk")
 player = NodePath("../PlayerCharacter3D")
 
-[node name="CharacterBody3D its a zombie" type="CharacterBody3D" parent="."]
+[node name="CharacterBody3D its a zombie" type="CharacterBody3D" parent="." groups=["blocks"]]
 transform = Transform3D(6.24, 0, 0, 0, 6.24, 0, 0, 0, 6.24, 0, 106.177025, -3.4154072)
-script = SubResource("GDScript_i5arm")
+script = ExtResource("5_zombie")
 
 [node name="Sketchfab_Scene zombie" parent="CharacterBody3D its a zombie" instance=ExtResource("3_jka67")]
 
@@ -717,9 +718,9 @@ script = SubResource("GDScript_i5arm")
 transform = Transform3D(0.05, 0, 0, 0, 0.085, 0, 0, 0, 0.01, 0, 0.08586693, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
-[node name="CharacterBody3D2 its a zombie" type="CharacterBody3D" parent="."]
+[node name="CharacterBody3D2 its a zombie" type="CharacterBody3D" parent="." groups=["blocks"]]
 transform = Transform3D(6.24, 0, 0, 0, 6.24, 0, 0, 0, 6.24, 0.667415, 106.177025, -3.4154072)
-script = SubResource("GDScript_i5arm")
+script = ExtResource("5_zombie")
 
 [node name="Sketchfab_Scene zombie" parent="CharacterBody3D2 its a zombie" instance=ExtResource("3_jka67")]
 
@@ -727,9 +728,9 @@ script = SubResource("GDScript_i5arm")
 transform = Transform3D(0.05, 0, 0, 0, 0.085, 0, 0, 0, 0.01, 0, 0.08586693, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
-[node name="CharacterBody3D3 its a zombie" type="CharacterBody3D" parent="."]
+[node name="CharacterBody3D3 its a zombie" type="CharacterBody3D" parent="." groups=["blocks"]]
 transform = Transform3D(6.24, 0, 0, 0, 6.24, 0, 0, 0, 6.24, -0.608122, 106.177025, -3.4154072)
-script = SubResource("GDScript_i5arm")
+script = ExtResource("5_zombie")
 
 [node name="Sketchfab_Scene zombie" parent="CharacterBody3D3 its a zombie" instance=ExtResource("3_jka67")]
 
