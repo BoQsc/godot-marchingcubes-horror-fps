@@ -1,9 +1,10 @@
-[gd_scene load_steps=26 format=3 uid="uid://c2pp8ci31jce2"]
+[gd_scene load_steps=27 format=3 uid="uid://c2pp8ci31jce2"]
 
 [ext_resource type="AudioStream" uid="uid://i6o3hrbi2ac2" path="res://music/mysterious-dark-background-310162.mp3" id="1_i5arm"]
 [ext_resource type="PackedScene" uid="uid://ceaj1g6o3ms5k" path="res://props/grass/grass.glb" id="1_jsk3o"]
 [ext_resource type="Script" path="res://Player.gd" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://bsiwysbjrs4v6" path="res://props/rigged_animated_cinematic_quality_tree_4.glb" id="1_wc5p8"]
+[ext_resource type="PackedScene" uid="uid://bhm7fy0qu42qg" path="res://props/grass plants/1/tropical_plant_2.glb" id="2_4arys"]
 [ext_resource type="Script" uid="uid://duyja5u7s3uww" path="res://TerrainManager.gd" id="2_terrain"]
 [ext_resource type="PackedScene" uid="uid://b8j2q4x5y607" path="res://MarchingCubesChunk.tscn" id="3_chunk"]
 [ext_resource type="PackedScene" uid="uid://o6xj2jdgavj" path="res://male_zombie.glb" id="3_jka67"]
@@ -704,6 +705,7 @@ func update_visuals():
 
 [node name="CharacterBody3D plants" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 36.99212, 14.369799)
+visible = false
 script = SubResource("GDScript_4arys")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D plants"]
@@ -711,6 +713,58 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0881653, 0)
 shape = SubResource("CapsuleShape3D_4arys")
 
 [node name="Sketchfab_Scene" parent="CharacterBody3D plants" instance=ExtResource("1_jsk3o")]
+
+[node name="Node3D many plants" type="Node3D" parent="."]
+
+[node name="CharacterBody3D plants2" type="CharacterBody3D" parent="Node3D many plants"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 38.342594, -3.9677353)
+script = SubResource("GDScript_4arys")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D many plants/CharacterBody3D plants2"]
+transform = Transform3D(0.565, 0, 0, 0, 0.565, 0, 0, 0, 0.565, 0, 0.59298706, 0)
+shape = SubResource("CapsuleShape3D_4arys")
+
+[node name="Sketchfab_Scene" parent="Node3D many plants/CharacterBody3D plants2" instance=ExtResource("2_4arys")]
+
+[node name="CharacterBody3D plants3" type="CharacterBody3D" parent="Node3D many plants"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8977659, 38.342594, -3.9677353)
+script = SubResource("GDScript_4arys")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D many plants/CharacterBody3D plants3"]
+transform = Transform3D(0.565, 0, 0, 0, 0.565, 0, 0, 0, 0.565, 0, 0.59298706, 0)
+shape = SubResource("CapsuleShape3D_4arys")
+
+[node name="Sketchfab_Scene" parent="Node3D many plants/CharacterBody3D plants3" instance=ExtResource("2_4arys")]
+
+[node name="CharacterBody3D plants4" type="CharacterBody3D" parent="Node3D many plants"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.785297, 38.342594, -3.9677353)
+script = SubResource("GDScript_4arys")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D many plants/CharacterBody3D plants4"]
+transform = Transform3D(0.565, 0, 0, 0, 0.565, 0, 0, 0, 0.565, 0, 0.59298706, 0)
+shape = SubResource("CapsuleShape3D_4arys")
+
+[node name="Sketchfab_Scene" parent="Node3D many plants/CharacterBody3D plants4" instance=ExtResource("2_4arys")]
+
+[node name="CharacterBody3D plants5" type="CharacterBody3D" parent="Node3D many plants"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.785297, 38.342594, -7.0564275)
+script = SubResource("GDScript_4arys")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D many plants/CharacterBody3D plants5"]
+transform = Transform3D(0.565, 0, 0, 0, 0.565, 0, 0, 0, 0.565, 0, 0.59298706, 0)
+shape = SubResource("CapsuleShape3D_4arys")
+
+[node name="Sketchfab_Scene" parent="Node3D many plants/CharacterBody3D plants5" instance=ExtResource("2_4arys")]
+
+[node name="CharacterBody3D plants6" type="CharacterBody3D" parent="Node3D many plants"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.785297, 38.342594, -7.0564275)
+script = SubResource("GDScript_4arys")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D many plants/CharacterBody3D plants6"]
+transform = Transform3D(0.565, 0, 0, 0, 0.565, 0, 0, 0, 0.565, 0, 0.59298706, 0)
+shape = SubResource("CapsuleShape3D_4arys")
+
+[node name="Sketchfab_Scene" parent="Node3D many plants/CharacterBody3D plants6" instance=ExtResource("2_4arys")]
 
 [node name="CharacterBody3D4 its a tree" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.442642, 54.100525, 0)
