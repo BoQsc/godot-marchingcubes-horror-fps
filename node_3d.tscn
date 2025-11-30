@@ -608,7 +608,10 @@ func _process(delta):
 	var cam = get_viewport().get_camera_3d()
 	if not cam: return
 	
-	var angle = fmod(cam.global_rotation_degrees.y, 360.0)
+	# FIX: In Godot, Y-rotation is positive to the LEFT (Counter-Clockwise).
+	# We want positive angles to be to the RIGHT (Clockwise/East).
+	# So we negate the rotation angle.
+	var angle = fmod(-cam.global_rotation_degrees.y, 360.0)
 	if angle < 0: angle += 360.0
 	
 	# Calculate offset
