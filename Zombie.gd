@@ -117,12 +117,20 @@ func die():
 	print("Zombie Died!")
 	velocity = Vector3.ZERO
 	
-	# Play death animation if available, or just fall over
-	# For now, let's just disable collision and fade out
+	# Disable collision
 	$CollisionShape3D.disabled = true
 	
-	# Simple "fall over" tween
-	var tween = create_tween()
-	tween.tween_property(self, "rotation:x", deg_to_rad(-90), 0.5)
-	# Remove invalid modulate tween
-	tween.tween_callback(queue_free).set_delay(2.0)
+	if anim_player:
+		anim_player.play("Take 001")
+		anim_player.seek(9.5, true) # Seek to death start
+		# We let it play normally for 1 second.
+		# Since we disabled looping in _ready, we need to ensure we don't loop back to walk/idle if the animation logic interferes.
+		# But current_state is DEAD, so _physics_process logic is skipped.
+		
+		# Wait for the death animation slice to finish (approx 1 second)
+		await get_tree().create_timer(1.0).timeout
+		anim_player.pause() # Stop at the end frame (lying down)
+	
+	# Disappear after a delay
+	await get_tree().create_timer(3.0).timeout
+	queue_free()
