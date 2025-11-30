@@ -10,6 +10,8 @@
 [ext_resource type="PackedScene" uid="uid://o6xj2jdgavj" path="res://male_zombie.glb" id="3_jka67"]
 [ext_resource type="PackedScene" uid="uid://1xh5cq6f56t3" path="res://heavy_pistol_animated.glb" id="4_r3fl7"]
 [ext_resource type="Script" uid="uid://dn62uutrsxi6o" path="res://ui/ESCMainMenu.tres.gd" id="8_6iypd"]
+[ext_resource type="Script" uid="uid://cdnnqwu84x4af" path="res://ui/HUDCompassBar.tres.gd" id="8_tereu"]
+[ext_resource type="Script" uid="uid://fdhxaetxv7my" path="res://ui/HUDToolbelt.tres.gd" id="9_cdqbm"]
 
 [sub_resource type="GDScript" id="GDScript_4arys"]
 script/source = "extends CharacterBody3D
@@ -221,61 +223,6 @@ func pick_random_direction():
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jka67"]
 
-[sub_resource type="GDScript" id="GDScript_compass"]
-script/source = "extends Control
-
-@onready var container = $ClippedArea/HBoxContainer
-# Width in pixels between each 45-degree increment (N to NE)
-const PX_PER_SECTION = 150.0 
-
-func _ready():
-	# Populate the compass strip
-	# Sequence: N NE E SE S SW W NW (Repeat N NE E SE to allow smooth looping)
-	var directions = [\"N\", \"NE\", \"E\", \"SE\", \"S\", \"SW\", \"W\", \"NW\", \"N\", \"NE\", \"E\", \"SE\"]
-	
-	for dir in directions:
-		var lbl = Label.new()
-		lbl.text = dir
-		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		
-		# Set fixed width for predictable sliding
-		lbl.custom_minimum_size.x = PX_PER_SECTION
-		lbl.custom_minimum_size.y = 40
-		
-		container.add_child(lbl)
-
-func _process(delta):
-	var cam = get_viewport().get_camera_3d()
-	if not cam: return
-	
-	# FIX: In Godot, Y-rotation is positive to the LEFT (Counter-Clockwise).
-	# We want positive angles to be to the RIGHT (Clockwise/East).
-	# So we negate the rotation angle.
-	var angle = fmod(-cam.global_rotation_degrees.y, 360.0)
-	if angle < 0: angle += 360.0
-	
-	# Calculate offset
-	# 360 degrees = 8 sections * PX_PER_SECTION
-	# angle / 45.0 gives us how many 'sections' we have rotated
-	
-	var offset = (angle / 45.0) * PX_PER_SECTION
-	
-	# Apply offset to the container.
-	# We center the 'N' (first element) at angle 0.
-	# The Container is centered in the parent Control.
-	# We shift left as angle increases.
-	
-	# Offset correction:
-	# The HBoxContainer starts at x=0 inside ClippedArea.
-	# We want index 0 (\"N\") to be centered in ClippedArea (width=300).
-	# So \"N\" center is at x=75 (half of 150).
-	# We want that x=75 to coincide with ClippedArea center (x=150).
-	# So initial start position of container should be +75.
-	var start_x = 75.0 
-	container.position.x = start_x - offset
-"
-
 [sub_resource type="GDScript" id="GDScript_time_system"]
 script/source = "extends Label
 
@@ -304,45 +251,6 @@ func advance_time():
 		day += 1
 	
 	text = \"Day %d    %02d:%02d\" % [day, hour, minute]
-"
-
-[sub_resource type="GDScript" id="GDScript_toolbelt"]
-script/source = "extends Control
-
-var current_slot = 0
-@onready var container = $HBoxContainer
-
-func _ready():
-	update_visuals()
-
-func _input(event):
-	if event is InputEventMouseButton and event.pressed:
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			current_slot = (current_slot - 1 + 9) % 9
-			update_visuals()
-		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			current_slot = (current_slot + 1) % 9
-			update_visuals()
-	
-	# Supports number keys 1-9
-	if event is InputEventKey and event.pressed:
-		if event.keycode >= KEY_1 and event.keycode <= KEY_9:
-			current_slot = event.keycode - KEY_1
-			update_visuals()
-
-func update_visuals():
-	if not container: return
-	
-	for i in range(container.get_child_count()):
-		var slot = container.get_child(i)
-		var border = slot.get_node_or_null(\"Border\")
-		
-		if i == current_slot:
-			slot.color = Color(0.3, 0.3, 0.3, 0.9) # Light up active slot
-			if border: border.visible = true
-		else:
-			slot.color = Color(0.1, 0.1, 0.1, 0.6) # Dim inactive slots
-			if border: border.visible = false
 "
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_noarx"]
@@ -851,7 +759,7 @@ offset_top = 20.0
 offset_right = 150.0
 offset_bottom = 60.0
 grow_horizontal = 2
-script = SubResource("GDScript_compass")
+script = ExtResource("8_tereu")
 
 [node name="Background" type="ColorRect" parent="CanvasLayer/HUDCompassBar"]
 layout_mode = 1
@@ -918,7 +826,7 @@ offset_right = 225.0
 offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 0
-script = SubResource("GDScript_toolbelt")
+script = ExtResource("9_cdqbm")
 
 [node name="XPBar" type="ColorRect" parent="CanvasLayer/HUDToolbelt"]
 layout_mode = 1
