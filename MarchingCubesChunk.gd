@@ -18,14 +18,37 @@ const TRI_TABLE = [[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
 const GRASS_TEXTURE = preload("res://green-grass-texture.jpg")
 const ROAD_TEXTURE = preload("res://gravel-texture.jpg")
 const TERRAIN_SHADER = preload("res://terrain.gdshader")
+const WATER_SHADER = preload("res://water.gdshader")
 
 func _ready():
+	# Terrain Material
 	var mat = ShaderMaterial.new()
 	mat.shader = TERRAIN_SHADER
 	mat.set_shader_parameter("grass_texture", GRASS_TEXTURE)
 	mat.set_shader_parameter("road_texture", ROAD_TEXTURE)
 	mat.set_shader_parameter("texture_scale", 1)
 	self.material_override = mat
+	
+	# Water Plane
+	var water_mesh = PlaneMesh.new()
+	var chunk_size = grid_size * scale_factor
+	water_mesh.size = Vector2(chunk_size, chunk_size)
+	
+	var water_inst = MeshInstance3D.new()
+	water_inst.mesh = water_mesh
+	
+	var water_mat = ShaderMaterial.new()
+	water_mat.shader = WATER_SHADER
+	water_inst.material_override = water_mat
+	
+	# Position water: centered in X/Z, fixed height in Y
+	# PlaneMesh is centered by default, so we offset it to the center of the chunk
+	water_inst.position = Vector3(chunk_size/2.0, 15.0, chunk_size/2.0) 
+	
+	# Disable collision for raycasting/physics (visual only)
+	# By default MeshInstance3D has no collision, so this is safe.
+	
+	add_child(water_inst)
 
 # Threading & Synchronization
 var thread: Thread
