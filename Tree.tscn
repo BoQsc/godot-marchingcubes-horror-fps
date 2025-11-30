@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://d3y2x1z5q4w3"]
+[gd_scene load_steps=3 format=3 uid="uid://d3y2x105q4w3"]
 
 [ext_resource type="PackedScene" uid="uid://bsiwysbjrs4v6" path="res://props/tree 1/rigged_animated_cinematic_quality_tree_4.glb" id="1_model"]
 
@@ -9,8 +9,7 @@ radius = 0.4
 [node name="Tree" type="StaticBody3D" groups=["blocks"]]
 
 [node name="Sketchfab_Scene" parent="." instance=ExtResource("1_model")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 shape = SubResource("CylinderShape3D_col")

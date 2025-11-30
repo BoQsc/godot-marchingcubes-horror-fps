@@ -246,6 +246,20 @@ shape = SubResource("CapsuleShape3D_wc5p8")
 script = ExtResource("2_terrain")
 chunk_scene = ExtResource("3_chunk")
 player = NodePath("../PlayerCharacter3D")
+render_distance = null
+chunks_per_frame = null
+max_concurrent_tasks = null
+grid_size = null
+scale_factor = null
+terrain_height = null
+target_fps = null
+min_fps = null
+fps_check_interval = null
+initial_loading_radius = null
+loading_screen_path = null
+initial_loading_timeout = null
+resume_check_interval = null
+performance_headroom_threshold = null
 
 [node name="CharacterBody3D its a zombie" type="CharacterBody3D" parent="." groups=["blocks"]]
 transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 106.177025, -13.805143)
