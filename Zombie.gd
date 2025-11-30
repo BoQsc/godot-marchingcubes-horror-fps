@@ -123,13 +123,10 @@ func die():
 	if anim_player:
 		anim_player.play("Take 001")
 		anim_player.seek(9.5, true) # Seek to death start
-		# We let it play normally for 1 second.
-		# Since we disabled looping in _ready, we need to ensure we don't loop back to walk/idle if the animation logic interferes.
-		# But current_state is DEAD, so _physics_process logic is skipped.
 		
-		# Wait for the death animation slice to finish (approx 1 second)
-		await get_tree().create_timer(1.0).timeout
-		anim_player.pause() # Stop at the end frame (lying down)
+		# Wait for the death animation slice (0.9s as requested)
+		await get_tree().create_timer(0.9).timeout
+		anim_player.pause() # Stop at the end frame
 	
 	# Disappear after a delay
 	await get_tree().create_timer(3.0).timeout
