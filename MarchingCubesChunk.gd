@@ -23,6 +23,7 @@ const SNOW_TEXTURE = preload("res://snow-texture.jpg")
 
 const TERRAIN_SHADER = preload("res://terrain.gdshader")
 const WATER_SHADER = preload("res://water.gdshader")
+const TREE_SCENE = preload("res://Tree.tscn")
 
 func _ready():
 	var mat = ShaderMaterial.new()
@@ -339,8 +340,64 @@ func _finalize_mesh(new_mesh, thread_ref):
 		if child is StaticBody3D:
 			child.queue_free()
 			
-	create_trimesh_collision()
+	var sb = StaticBody3D.new()
+	var cs = CollisionShape3D.new()
+	cs.shape = new_mesh.create_trimesh_shape()
+	sb.add_child(cs)
+	add_child(sb)
+	
+	populate_vegetation()
+	
 	generation_complete.emit(chunk_coord)
+
+func populate_vegetation():
+	# Use Physics Raycast for perfect placement
+	# Collision shape is already created and added to tree in _finalize_mesh
+	
+	var step = 4 
+	var s = grid_size
+	var global_x = chunk_coord.x * grid_size
+	var global_z = chunk_coord.z * grid_size
+	
+	var space_state = get_world_3d().direct_space_state
+	
+	for x in range(2, s - 2, step):
+		for z in range(2, s - 2, step):
+			
+			var tree_val = noise.get_noise_2d((global_x + x) * 5.0, (global_z + z) * 5.0)
+			
+			if tree_val > 0.2:
+				# Raycast from top of chunk down
+				var from_pos = to_global(Vector3(x * scale_factor, grid_size * scale_factor, z * scale_factor))
+				var to_pos = to_global(Vector3(x * scale_factor, -10.0, z * scale_factor))
+				
+				var query = PhysicsRayQueryParameters3D.create(from_pos, to_pos)
+				# Ensure we hit ourselves (the chunk)
+				# query.collide_with_bodies = true (default)
+				
+				var result = space_state.intersect_ray(query)
+				
+				if result:
+					var hit_y = result.position.y
+					
+					# Biome Rules
+					if hit_y > 19.0 and hit_y < 50.0:
+						
+						# Road Check
+						# Convert local hit to grid index roughly
+						var local_hit = to_local(result.position)
+						var grid_y = int(local_hit.y / scale_factor)
+						var idx = x * (s+1)*(s+1) + clamp(grid_y, 0, s) * (s+1) + z
+						
+						if idx < road_data.size() and road_data[idx] < 0.5:
+							var tree = TREE_SCENE.instantiate()
+							add_child(tree)
+							# Use the EXACT raycast hit position (local)
+							tree.global_position = result.position
+							
+							tree.rotate_y(randf() * TAU)
+							var scale_mod = randf_range(0.8, 1.2)
+							tree.scale = Vector3(scale_mod, scale_mod, scale_mod)
 
 func vertex_interp(isolevel: float, p1: Vector3, p2: Vector3, val_p1: float, val_p2: float) -> Vector3:
 	if abs(isolevel - val_p1) < 0.00001: return p1
