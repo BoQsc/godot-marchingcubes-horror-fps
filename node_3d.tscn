@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://c2pp8ci31jce2"]
+[gd_scene load_steps=29 format=3 uid="uid://c2pp8ci31jce2"]
 
 [ext_resource type="AudioStream" uid="uid://i6o3hrbi2ac2" path="res://music/mysterious-dark-background-310162.mp3" id="1_i5arm"]
 [ext_resource type="PackedScene" uid="uid://ceaj1g6o3ms5k" path="res://props/grass/grass.glb" id="1_jsk3o"]
@@ -135,7 +135,8 @@ func _ready():
 	if anim_player:
 		anim_player.play(\"Take 001\")
 		if anim_player.has_animation(\"Take 001\"):
-			# CRITICAL: Turn OFF internal looping. We handle the math ourselves.
+			# CRITICAL: Turn OFF internal looping.
+			# We handle the math ourselves.
 			anim_player.get_animation(\"Take 001\").loop_mode = Animation.LOOP_NONE
 		
 		# CRITICAL: Sync animation to physics (60 FPS) to stop visual vibration
@@ -251,7 +252,7 @@ func _input(event: InputEvent) -> void:
 	if Engine.is_editor_hint():
 		return
 		
-	# Handle mouse look
+	# Handle mouse look ONLY if captured
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		# Rotate parent horizontally (yaw)
 		get_parent().rotate_y(-event.relative.x * MOUSE_SENSITIVITY)
@@ -266,14 +267,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if Engine.is_editor_hint():
 		return
 		
-	# Toggle mouse capture when pressing Cancel (Esc)
-	if event.is_action_pressed(\"ui_cancel\"):
-		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-		else:
-			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-			
-	# Click to recapture mouse if visible
+	# Mouse Capture Logic
+	# This only runs if the UI didn't catch the click.
+	# So if Menu is open (STOP filter), this won't run.
+	# If Menu is closed, this catches clicks on the world to recapture mouse.
 	if event is InputEventMouseButton and event.pressed:
 		if Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -323,6 +320,10 @@ func setup_crosshair():
 	center_cont.add_child(dot)
 
 func _input(event):
+	# SAFETY CHECK: Do not shoot if mouse is visible (Menu is open)
+	if Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE:
+		return
+
 	# Check if the event is a Mouse Button event
 	if event is InputEventMouseButton:
 		if event.pressed:
@@ -616,7 +617,7 @@ func _process(delta):
 	
 	var offset = (angle / 45.0) * PX_PER_SECTION
 	
-	# Apply offset to the container. 
+	# Apply offset to the container.
 	# We center the 'N' (first element) at angle 0.
 	# The Container is centered in the parent Control.
 	# We shift left as angle increases.
@@ -627,7 +628,6 @@ func _process(delta):
 	# So \"N\" center is at x=75 (half of 150).
 	# We want that x=75 to coincide with ClippedArea center (x=150).
 	# So initial start position of container should be +75.
-	
 	var start_x = 75.0 
 	container.position.x = start_x - offset
 "
@@ -699,6 +699,37 @@ func update_visuals():
 		else:
 			slot.color = Color(0.1, 0.1, 0.1, 0.6) # Dim inactive slots
 			if border: border.visible = false
+"
+
+[sub_resource type="GDScript" id="GDScript_menu_logic"]
+script/source = "extends Control
+
+func _ready():
+	# Start hidden (Game mode)
+	visible = false
+	
+	# Connect the button signal manually since it is a dynamic child
+	var btn = get_node_or_null(\"ExitButton\")
+	if btn:
+		btn.pressed.connect(_on_exit_pressed)
+
+func _input(event):
+	# Toggle Menu on ESC
+	if event.is_action_pressed(\"ui_cancel\"):
+		visible = not visible
+		
+		if visible:
+			# Menu Mode: Show mouse
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		else:
+			# Game Mode: Capture mouse
+			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+			
+		# STOP the input from going to other scripts
+		get_viewport().set_input_as_handled()
+
+func _on_exit_pressed():
+	get_tree().quit()
 "
 
 [node name="Node3D" type="Node3D"]
@@ -859,11 +890,28 @@ offset_right = 40.0
 offset_bottom = 23.0
 text = "Best game 3 - Press ESC for Main Menu"
 
-[node name="Label2" type="Label" parent="PlayerCharacter3D/CanvasLayer/Control"]
-visible = false
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
+[node name="ESCMainMenu" type="Control" parent="PlayerCharacter3D/CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_menu_logic")
+
+[node name="Label2" type="Label" parent="PlayerCharacter3D/CanvasLayer/ESCMainMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
 text = " 
 
 
@@ -871,14 +919,31 @@ text = "
 
 Left Mouse: Shoot                       Right Mouse: Nothing
 
-                                    SHIFT:
+          
+                           SHIFT:
 Left Mouse: Box                         Right Mouse: Road
 
                                     CTRL:
-Left Mouse: Sphere                         Right Mouse: Dig
+Left Mouse: Sphere       
+                   Right Mouse: Dig
 
                                       ALT:
 Left Mouse: Place                         Right Mouse: Remove"
+
+[node name="ExitButton" type="Button" parent="PlayerCharacter3D/CanvasLayer/ESCMainMenu"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -200.0
+offset_right = 100.0
+offset_bottom = -150.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "EXIT GAME"
 
 [node name="CompassBar" type="Control" parent="PlayerCharacter3D/CanvasLayer"]
 layout_mode = 3
