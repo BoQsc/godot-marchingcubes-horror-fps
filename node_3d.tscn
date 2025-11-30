@@ -841,7 +841,7 @@ offset_right = 40.0
 offset_bottom = 23.0
 text = "Best game 3 - Press ESC for Main Menu"
 
-[node name="CompassBar" type="Control" parent="CanvasLayer"]
+[node name="HUDCompassBar" type="Control" parent="CanvasLayer"]
 layout_mode = 3
 anchors_preset = 5
 anchor_left = 0.5
@@ -853,7 +853,7 @@ offset_bottom = 60.0
 grow_horizontal = 2
 script = SubResource("GDScript_compass")
 
-[node name="Background" type="ColorRect" parent="CanvasLayer/CompassBar"]
+[node name="Background" type="ColorRect" parent="CanvasLayer/HUDCompassBar"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -862,7 +862,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.392157)
 
-[node name="ClippedArea" type="Control" parent="CanvasLayer/CompassBar"]
+[node name="ClippedArea" type="Control" parent="CanvasLayer/HUDCompassBar"]
 clip_contents = true
 layout_mode = 1
 anchors_preset = 15
@@ -871,13 +871,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/CompassBar/ClippedArea"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/HUDCompassBar/ClippedArea"]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 theme_override_constants/separation = 0
 
-[node name="Indicator" type="ColorRect" parent="CanvasLayer/CompassBar"]
+[node name="Indicator" type="ColorRect" parent="CanvasLayer/HUDCompassBar"]
 layout_mode = 1
 anchors_preset = 13
 anchor_left = 0.5
@@ -888,7 +888,7 @@ offset_right = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TimeLabel" type="Label" parent="CanvasLayer/CompassBar"]
+[node name="TimeLabel" type="Label" parent="CanvasLayer/HUDCompassBar"]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -905,7 +905,7 @@ text = "Day 1    13:00"
 horizontal_alignment = 1
 script = SubResource("GDScript_time_system")
 
-[node name="Toolbelt" type="Control" parent="CanvasLayer"]
+[node name="HUDToolbelt" type="Control" parent="CanvasLayer"]
 layout_mode = 3
 anchors_preset = 7
 anchor_left = 0.5
@@ -920,7 +920,7 @@ grow_horizontal = 2
 grow_vertical = 0
 script = SubResource("GDScript_toolbelt")
 
-[node name="XPBar" type="ColorRect" parent="CanvasLayer/Toolbelt"]
+[node name="XPBar" type="ColorRect" parent="CanvasLayer/HUDToolbelt"]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -929,7 +929,7 @@ offset_bottom = -6.0
 grow_horizontal = 2
 color = Color(0.6, 0.2, 0.9, 1)
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/Toolbelt"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/HUDToolbelt"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -939,12 +939,12 @@ grow_vertical = 2
 theme_override_constants/separation = 5
 alignment = 1
 
-[node name="Slot0" type="ColorRect" parent="CanvasLayer/Toolbelt/HBoxContainer"]
+[node name="Slot0" type="ColorRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer"]
 custom_minimum_size = Vector2(45, 45)
 layout_mode = 2
 color = Color(0.1, 0.1, 0.1, 0.5)
 
-[node name="Border" type="ReferenceRect" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot0"]
+[node name="Border" type="ReferenceRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot0"]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -956,7 +956,7 @@ border_color = Color(1, 1, 1, 1)
 border_width = 2.0
 editor_only = false
 
-[node name="Label" type="Label" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot0"]
+[node name="Label" type="Label" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot0"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -973,12 +973,12 @@ text = "1"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot1" type="ColorRect" parent="CanvasLayer/Toolbelt/HBoxContainer"]
+[node name="Slot1" type="ColorRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer"]
 custom_minimum_size = Vector2(45, 45)
 layout_mode = 2
 color = Color(0.1, 0.1, 0.1, 0.5)
 
-[node name="Border" type="ReferenceRect" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot1"]
+[node name="Border" type="ReferenceRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot1"]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -990,7 +990,7 @@ border_color = Color(1, 1, 1, 1)
 border_width = 2.0
 editor_only = false
 
-[node name="Label" type="Label" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot1"]
+[node name="Label" type="Label" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot1"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -1007,12 +1007,12 @@ text = "2"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot2" type="ColorRect" parent="CanvasLayer/Toolbelt/HBoxContainer"]
+[node name="Slot2" type="ColorRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer"]
 custom_minimum_size = Vector2(45, 45)
 layout_mode = 2
 color = Color(0.1, 0.1, 0.1, 0.5)
 
-[node name="Border" type="ReferenceRect" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot2"]
+[node name="Border" type="ReferenceRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot2"]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -1024,7 +1024,7 @@ border_color = Color(1, 1, 1, 1)
 border_width = 2.0
 editor_only = false
 
-[node name="Label" type="Label" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot2"]
+[node name="Label" type="Label" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot2"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -1041,12 +1041,12 @@ text = "3"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot3" type="ColorRect" parent="CanvasLayer/Toolbelt/HBoxContainer"]
+[node name="Slot3" type="ColorRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer"]
 custom_minimum_size = Vector2(45, 45)
 layout_mode = 2
 color = Color(0.1, 0.1, 0.1, 0.5)
 
-[node name="Border" type="ReferenceRect" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot3"]
+[node name="Border" type="ReferenceRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot3"]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -1058,7 +1058,7 @@ border_color = Color(1, 1, 1, 1)
 border_width = 2.0
 editor_only = false
 
-[node name="Label" type="Label" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot3"]
+[node name="Label" type="Label" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot3"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -1075,12 +1075,12 @@ text = "4"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot4" type="ColorRect" parent="CanvasLayer/Toolbelt/HBoxContainer"]
+[node name="Slot4" type="ColorRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer"]
 custom_minimum_size = Vector2(45, 45)
 layout_mode = 2
 color = Color(0.1, 0.1, 0.1, 0.5)
 
-[node name="Border" type="ReferenceRect" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot4"]
+[node name="Border" type="ReferenceRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot4"]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -1092,7 +1092,7 @@ border_color = Color(1, 1, 1, 1)
 border_width = 2.0
 editor_only = false
 
-[node name="Label" type="Label" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot4"]
+[node name="Label" type="Label" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot4"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -1109,12 +1109,12 @@ text = "5"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot5" type="ColorRect" parent="CanvasLayer/Toolbelt/HBoxContainer"]
+[node name="Slot5" type="ColorRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer"]
 custom_minimum_size = Vector2(45, 45)
 layout_mode = 2
 color = Color(0.1, 0.1, 0.1, 0.5)
 
-[node name="Border" type="ReferenceRect" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot5"]
+[node name="Border" type="ReferenceRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot5"]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -1126,7 +1126,7 @@ border_color = Color(1, 1, 1, 1)
 border_width = 2.0
 editor_only = false
 
-[node name="Label" type="Label" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot5"]
+[node name="Label" type="Label" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot5"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -1143,12 +1143,12 @@ text = "6"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot6" type="ColorRect" parent="CanvasLayer/Toolbelt/HBoxContainer"]
+[node name="Slot6" type="ColorRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer"]
 custom_minimum_size = Vector2(45, 45)
 layout_mode = 2
 color = Color(0.1, 0.1, 0.1, 0.5)
 
-[node name="Border" type="ReferenceRect" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot6"]
+[node name="Border" type="ReferenceRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot6"]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -1160,7 +1160,7 @@ border_color = Color(1, 1, 1, 1)
 border_width = 2.0
 editor_only = false
 
-[node name="Label" type="Label" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot6"]
+[node name="Label" type="Label" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot6"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -1177,12 +1177,12 @@ text = "7"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot7" type="ColorRect" parent="CanvasLayer/Toolbelt/HBoxContainer"]
+[node name="Slot7" type="ColorRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer"]
 custom_minimum_size = Vector2(45, 45)
 layout_mode = 2
 color = Color(0.1, 0.1, 0.1, 0.5)
 
-[node name="Border" type="ReferenceRect" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot7"]
+[node name="Border" type="ReferenceRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot7"]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -1194,7 +1194,7 @@ border_color = Color(1, 1, 1, 1)
 border_width = 2.0
 editor_only = false
 
-[node name="Label" type="Label" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot7"]
+[node name="Label" type="Label" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot7"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -1211,12 +1211,12 @@ text = "8"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot8" type="ColorRect" parent="CanvasLayer/Toolbelt/HBoxContainer"]
+[node name="Slot8" type="ColorRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer"]
 custom_minimum_size = Vector2(45, 45)
 layout_mode = 2
 color = Color(0.1, 0.1, 0.1, 0.5)
 
-[node name="Border" type="ReferenceRect" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot8"]
+[node name="Border" type="ReferenceRect" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot8"]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -1228,7 +1228,7 @@ border_color = Color(1, 1, 1, 1)
 border_width = 2.0
 editor_only = false
 
-[node name="Label" type="Label" parent="CanvasLayer/Toolbelt/HBoxContainer/Slot8"]
+[node name="Label" type="Label" parent="CanvasLayer/HUDToolbelt/HBoxContainer/Slot8"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -1245,7 +1245,7 @@ text = "9"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HealthBar" type="ColorRect" parent="CanvasLayer/Toolbelt"]
+[node name="HealthBar" type="ColorRect" parent="CanvasLayer/HUDToolbelt"]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
