@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://b8j2q4x5y607" path="res://MarchingCubesChunk.tscn" id="3_chunk"]
 [ext_resource type="PackedScene" uid="uid://o6xj2jdgavj" path="res://models/zombie/male_zombie.glb" id="3_jka67"]
 [ext_resource type="PackedScene" uid="uid://1xh5cq6f56t3" path="res://models/pistol/heavy_pistol_animated.glb" id="4_r3fl7"]
-[ext_resource type="Script" path="res://Zombie.gd" id="5_zombie"]
+[ext_resource type="Script" uid="uid://bx5qil1kyco0t" path="res://Zombie.gd" id="5_zombie"]
 [ext_resource type="Script" uid="uid://dn62uutrsxi6o" path="res://ui/ESCMainMenu.tres.gd" id="8_6iypd"]
 [ext_resource type="Script" uid="uid://cdnnqwu84x4af" path="res://ui/HUDCompassBar.tres.gd" id="8_tereu"]
 [ext_resource type="Script" uid="uid://fdhxaetxv7my" path="res://ui/HUDToolbelt.tres.gd" id="9_cdqbm"]
@@ -113,115 +113,7 @@ func _physics_process(delta):
 radius = 0.6
 height = 3.0
 
-[sub_resource type="GDScript" id="GDScript_i5arm"]
-script/source = "extends CharacterBody3D
-
 # --- Settings ---
-@export var move_speed: float = 1.0
-@export var gravity: float = 9.8
-@export var friction: float = 10.0
-
-# --- References ---
-@onready var anim_player = $\"Sketchfab_Scene zombie\".find_child(\"AnimationPlayer\")
-
-# --- State ---
-var current_state = \"IDLE\"
-var wander_timer: float = 0.0
-
-func _ready():
-	# 1. SETUP NOSE (Re-added RayCast as it is more reliable for \"Walls\" than is_on_wall)
-	# Using RayCast prevents the \"is_on_wall\" flicker if the mesh is bumpy.
-	var wall_detector = RayCast3D.new()
-	wall_detector.name = \"WallDetector\"
-	add_child(wall_detector)
-	wall_detector.position = Vector3(0, 1.0, 0.6) # Forward position
-	wall_detector.enabled = true
-	wall_detector.target_position = Vector3(0, 0, 1.0)
-
-	if anim_player:
-		anim_player.play(\"Take 001\")
-		if anim_player.has_animation(\"Take 001\"):
-			# CRITICAL: Turn OFF internal looping.
-			# We handle the math ourselves.
-			anim_player.get_animation(\"Take 001\").loop_mode = Animation.LOOP_NONE
-		
-		# CRITICAL: Sync animation to physics (60 FPS) to stop visual vibration
-		anim_player.callback_mode_process = AnimationPlayer.ANIMATION_CALLBACK_MODE_PROCESS_PHYSICS
-
-	# Safety Start
-	set_physics_process(false)
-	await get_tree().create_timer(0.5).timeout
-	set_physics_process(true)
-	change_state(\"IDLE\")
-
-func _physics_process(delta):
-	# 1. Gravity (with Floor Snap)
-	if not is_on_floor():
-		velocity.y -= gravity * delta
-	else:
-		velocity.y = -0.1 # Keep him glued to floor
-
-	# 2. SMOOTH ANIMATION LOOPING (The Twitch Fix)
-	if anim_player:
-		var t = anim_player.current_animation_position
-		
-		if current_state == \"IDLE\":
-			# Idle Range: 0.0 to 1.0
-			if t >= 1.0:
-				# MATH FIX: Instead of seek(0.0), we keep the overflow.
-				# If t is 1.02, we seek to 0.02. This keeps it smooth.
-				anim_player.seek(t - 1.0)
-				
-		elif current_state == \"WALK\":
-			# Walk Range: 1.0 to 2.0
-			if t >= 2.0:
-				# MATH FIX: If t is 2.02, we seek to 1.02.
-				anim_player.seek(1.0 + (t - 2.0))
-
-	# 3. MOVEMENT
-	if current_state == \"IDLE\":
-		velocity.x = move_toward(velocity.x, 0, friction * delta)
-		velocity.z = move_toward(velocity.z, 0, friction * delta)
-		
-		wander_timer -= delta
-		if wander_timer <= 0:
-			pick_random_direction()
-			change_state(\"WALK\")
-			
-	elif current_state == \"WALK\":
-		var forward_dir = transform.basis.z.normalized()
-		velocity.x = forward_dir.x * move_speed
-		velocity.z = forward_dir.z * move_speed
-		
-		wander_timer -= delta
-		
-		# Check wall detector
-		var wd = get_node_or_null(\"WallDetector\")
-		if (wd and wd.is_colliding()) or wander_timer <= 0:
-			change_state(\"IDLE\")
-
-	move_and_slide()
-	
-	# Void Safety
-	if global_position.y < -50:
-		velocity = Vector3.ZERO
-		global_position = Vector3(0, 5, 0)
-
-func change_state(new_state):
-	current_state = new_state
-	
-	if anim_player:
-		# When switching states, we do a hard seek because the pose changes anyway
-		if new_state == \"IDLE\": anim_player.seek(0.0)
-		if new_state == \"WALK\": anim_player.seek(1.0)
-		
-	if new_state == \"IDLE\": wander_timer = randf_range(2.0, 4.0)
-	if new_state == \"WALK\": wander_timer = randf_range(3.0, 6.0)
-
-func pick_random_direction():
-	rotate_y(deg_to_rad(randf_range(90, 270)))
-"
-
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jka67"]
 
 [sub_resource type="GDScript" id="GDScript_time_system"]
@@ -709,8 +601,12 @@ chunk_scene = ExtResource("3_chunk")
 player = NodePath("../PlayerCharacter3D")
 
 [node name="CharacterBody3D its a zombie" type="CharacterBody3D" parent="." groups=["blocks"]]
-transform = Transform3D(6.24, 0, 0, 0, 6.24, 0, 0, 0, 6.24, 0, 106.177025, -3.4154072)
+transform = Transform3D(6.24, 0, 0, 0, 6.24, 0, 0, 0, 6.24, 0, 106.177025, -13.805143)
 script = ExtResource("5_zombie")
+max_health = null
+move_speed = null
+gravity = null
+friction = null
 
 [node name="Sketchfab_Scene zombie" parent="CharacterBody3D its a zombie" instance=ExtResource("3_jka67")]
 
@@ -719,8 +615,12 @@ transform = Transform3D(0.05, 0, 0, 0, 0.085, 0, 0, 0, 0.01, 0, 0.08586693, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
 [node name="CharacterBody3D2 its a zombie" type="CharacterBody3D" parent="." groups=["blocks"]]
-transform = Transform3D(6.24, 0, 0, 0, 6.24, 0, 0, 0, 6.24, 0.667415, 106.177025, -3.4154072)
+transform = Transform3D(6.24, 0, 0, 0, 6.24, 0, 0, 0, 6.24, 0.667415, 106.177025, -13.805143)
 script = ExtResource("5_zombie")
+max_health = null
+move_speed = null
+gravity = null
+friction = null
 
 [node name="Sketchfab_Scene zombie" parent="CharacterBody3D2 its a zombie" instance=ExtResource("3_jka67")]
 
@@ -729,8 +629,12 @@ transform = Transform3D(0.05, 0, 0, 0, 0.085, 0, 0, 0, 0.01, 0, 0.08586693, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
 [node name="CharacterBody3D3 its a zombie" type="CharacterBody3D" parent="." groups=["blocks"]]
-transform = Transform3D(6.24, 0, 0, 0, 6.24, 0, 0, 0, 6.24, -0.608122, 106.177025, -3.4154072)
+transform = Transform3D(6.24, 0, 0, 0, 6.24, 0, 0, 0, 6.24, -0.608122, 106.177025, -13.805143)
 script = ExtResource("5_zombie")
+max_health = null
+move_speed = null
+gravity = null
+friction = null
 
 [node name="Sketchfab_Scene zombie" parent="CharacterBody3D3 its a zombie" instance=ExtResource("3_jka67")]
 

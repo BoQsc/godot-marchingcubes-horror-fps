@@ -89,7 +89,7 @@ func _physics_process(delta):
 			change_state("WALK")
 			
 		var player = get_node_or_null("/root/Node3D/PlayerCharacter3D")
-		if player and global_position.distance_to(player.global_position) < 15.0:
+		if player and global_position.distance_to(player.global_position) < 2.0:
 			change_state("CHASE")
 			
 	elif current_state == "WALK":
@@ -104,7 +104,7 @@ func _physics_process(delta):
 			change_state("IDLE")
 			
 		var player = get_node_or_null("/root/Node3D/PlayerCharacter3D")
-		if player and global_position.distance_to(player.global_position) < 15.0:
+		if player and global_position.distance_to(player.global_position) < 2.0:
 			change_state("CHASE")
 
 	elif current_state == "CHASE":
