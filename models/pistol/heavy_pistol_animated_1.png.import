@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://fp5dyhsf8gxf"
-path.s3tc="res://.godot/imported/heavy_pistol_animated_1.png-7afa88a5f240a365abbff8140909faac.s3tc.ctex"
+path.s3tc="res://.godot/imported/heavy_pistol_animated_1.png-29f8441e5cb0ba4b6b97d63f89793d98.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -14,8 +14,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://heavy_pistol_animated_1.png"
-dest_files=["res://.godot/imported/heavy_pistol_animated_1.png-7afa88a5f240a365abbff8140909faac.s3tc.ctex"]
+source_file="res://models/pistol/heavy_pistol_animated_1.png"
+dest_files=["res://.godot/imported/heavy_pistol_animated_1.png-29f8441e5cb0ba4b6b97d63f89793d98.s3tc.ctex"]
 
 [params]
 

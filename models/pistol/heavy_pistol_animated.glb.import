@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://1xh5cq6f56t3"
-path="res://.godot/imported/heavy_pistol_animated.glb-16839b0b4c2fb115a2f1feaeae80ce7c.scn"
+path="res://.godot/imported/heavy_pistol_animated.glb-31f57aea747f9edee5855b198796b423.scn"
 
 [deps]
 
-source_file="res://heavy_pistol_animated.glb"
-dest_files=["res://.godot/imported/heavy_pistol_animated.glb-16839b0b4c2fb115a2f1feaeae80ce7c.scn"]
+source_file="res://models/pistol/heavy_pistol_animated.glb"
+dest_files=["res://.godot/imported/heavy_pistol_animated.glb-31f57aea747f9edee5855b198796b423.scn"]
 
 [params]
 

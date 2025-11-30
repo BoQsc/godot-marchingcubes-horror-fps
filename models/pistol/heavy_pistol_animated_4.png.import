@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b8ctuid3ym8rp"
-path.s3tc="res://.godot/imported/heavy_pistol_animated_3.png-d9c5148275de27c701c2179700776941.s3tc.ctex"
+uid="uid://cs1g5i5bcuv2q"
+path.s3tc="res://.godot/imported/heavy_pistol_animated_4.png-fccd3533937d611ea727df02469296a8.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "a1d551e6821c26bba651902b6073c574"
+"md5": "f3989766c45857e76b8c9d923042cd56"
 }
 
 [deps]
 
-source_file="res://heavy_pistol_animated_3.png"
-dest_files=["res://.godot/imported/heavy_pistol_animated_3.png-d9c5148275de27c701c2179700776941.s3tc.ctex"]
+source_file="res://models/pistol/heavy_pistol_animated_4.png"
+dest_files=["res://.godot/imported/heavy_pistol_animated_4.png-fccd3533937d611ea727df02469296a8.s3tc.ctex"]
 
 [params]
 
@@ -29,8 +29,8 @@ compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=0
-roughness/src_normal=""
+roughness/mode=8
+roughness/src_normal="res://heavy_pistol_animated_5.png"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2
