@@ -1,4 +1,5 @@
 shader_type spatial;
+render_mode world_vertex_coords;
 
 // Textures
 uniform sampler2D grass_texture : source_color, filter_linear_mipmap_anisotropic;
@@ -9,26 +10,24 @@ uniform sampler2D snow_texture : source_color, filter_linear_mipmap_anisotropic;
 
 uniform float texture_scale = 0.1;
 
-// Varyings passed from vertex to fragment
+// Varyings
 varying float road_weight;
-varying vec3 uv1_power_normal;
-varying vec3 uv1_triplanar_pos;
+varying vec3 w_normal;
+varying vec3 w_vertex; // World Vertex interpolated
 varying float height;
 
 void vertex() {
     road_weight = COLOR.r;
     
-    // Triplanar setup
-    vec3 normal = normalize(NORMAL);
-    // Higher power = sharper transitions between x/y/z planar projections
-    uv1_power_normal = pow(abs(normal), vec3(4.0));
-    uv1_power_normal /= dot(uv1_power_normal, vec3(1.0));
+    // Pass World Normal to fragment for pixel-perfect triplanar blending
+    // With world_vertex_coords, NORMAL is World Space.
+    w_normal = NORMAL;
     
-    // World position for texture mapping
-    uv1_triplanar_pos = VERTEX * texture_scale;
+    // Pass World Position
+    w_vertex = VERTEX;
     
-    // Pass global height
-    height = (MODEL_MATRIX * vec4(VERTEX, 1.0)).y;
+    // Height for biomes
+    height = VERTEX.y;
 }
 
 vec4 triplanar_texture(sampler2D p_sampler, vec3 p_weights, vec3 p_triplanar_pos) {
@@ -40,12 +39,20 @@ vec4 triplanar_texture(sampler2D p_sampler, vec3 p_weights, vec3 p_triplanar_pos
 }
 
 void fragment() {
+    // 1. Calculate Triplanar Weights in Fragment Shader (Stable)
+    vec3 normal = normalize(w_normal);
+    vec3 power_normal = pow(abs(normal), vec3(4.0));
+    power_normal /= dot(power_normal, vec3(1.0));
+    
+    // 2. Calculate Texture Coordinates
+    vec3 triplanar_pos = w_vertex * texture_scale;
+
     // Sample all textures
-    vec3 grass = triplanar_texture(grass_texture, uv1_power_normal, uv1_triplanar_pos).rgb;
-    vec3 road = triplanar_texture(road_texture, uv1_power_normal, uv1_triplanar_pos).rgb;
-    vec3 sand = triplanar_texture(sand_texture, uv1_power_normal, uv1_triplanar_pos).rgb;
-    vec3 rock = triplanar_texture(rock_texture, uv1_power_normal, uv1_triplanar_pos).rgb;
-    vec3 snow = triplanar_texture(snow_texture, uv1_power_normal, uv1_triplanar_pos).rgb;
+    vec3 grass = triplanar_texture(grass_texture, power_normal, triplanar_pos).rgb;
+    vec3 road = triplanar_texture(road_texture, power_normal, triplanar_pos).rgb;
+    vec3 sand = triplanar_texture(sand_texture, power_normal, triplanar_pos).rgb;
+    vec3 rock = triplanar_texture(rock_texture, power_normal, triplanar_pos).rgb;
+    vec3 snow = triplanar_texture(snow_texture, power_normal, triplanar_pos).rgb;
 
     vec3 final_albedo = grass;
 
@@ -59,9 +66,8 @@ void fragment() {
     final_albedo = mix(final_albedo, snow, snow_factor);
 
     // 2. Slope Mixing (Rock)
-    // Standard up-facing normal.y is 1.0. Vertical is 0.0.
-    // We want rock on steep slopes (y < 0.7ish)
-    float slope = normalize(NORMAL).y;
+    // Use the pixel normal for slope check
+    float slope = normal.y;
     float rock_factor = 1.0 - smoothstep(0.5, 0.8, slope);
     
     // Rock overrides sand/grass/snow

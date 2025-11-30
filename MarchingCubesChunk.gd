@@ -354,7 +354,7 @@ func populate_vegetation():
 	# Use Physics Raycast for perfect placement
 	# Collision shape is already created and added to tree in _finalize_mesh
 	
-	var step = 4 
+	var step = 8 # Reduced density for performance (was 4)
 	var s = grid_size
 	var global_x = chunk_coord.x * grid_size
 	var global_z = chunk_coord.z * grid_size
