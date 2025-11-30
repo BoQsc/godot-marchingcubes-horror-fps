@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3 uid="uid://cihadw5rqhrwr"]
 
-[ext_resource type="Script" path="res://Player.gd" id="1_player"]
+[ext_resource type="Script" path="res://PlayerCharacter3D.gd" id="1_player"]
 [ext_resource type="Script" uid="uid://0eddfnmpdd2y" path="res://compute_version/ComputeTerrainManager.gd" id="2_manager"]
 [ext_resource type="PackedScene" path="res://compute_version/ComputeChunk.tscn" id="3_chunk"]
 

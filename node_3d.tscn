@@ -2,7 +2,7 @@
 
 [ext_resource type="AudioStream" uid="uid://i6o3hrbi2ac2" path="res://music/mysterious-dark-background-310162.mp3" id="1_i5arm"]
 [ext_resource type="PackedScene" uid="uid://ceaj1g6o3ms5k" path="res://props/grass/grass.glb" id="1_jsk3o"]
-[ext_resource type="Script" path="res://Player.gd" id="1_player"]
+[ext_resource type="Script" path="res://PlayerCharacter3D.gd" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://bsiwysbjrs4v6" path="res://props/rigged_animated_cinematic_quality_tree_4.glb" id="1_wc5p8"]
 [ext_resource type="PackedScene" uid="uid://bhm7fy0qu42qg" path="res://props/grass plants/1/tropical_plant_2.glb" id="2_4arys"]
 [ext_resource type="Script" uid="uid://duyja5u7s3uww" path="res://TerrainManager.gd" id="2_terrain"]
