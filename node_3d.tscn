@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://c2pp8ci31jce2"]
+[gd_scene load_steps=28 format=3 uid="uid://c2pp8ci31jce2"]
 
 [ext_resource type="AudioStream" uid="uid://i6o3hrbi2ac2" path="res://music/mysterious-dark-background-310162.mp3" id="1_i5arm"]
 [ext_resource type="PackedScene" uid="uid://ceaj1g6o3ms5k" path="res://props/grass/grass.glb" id="1_jsk3o"]
@@ -577,6 +577,37 @@ func _play_random_sound():
 	play()
 "
 
+[sub_resource type="GDScript" id="GDScript_menu_logic"]
+script/source = "extends Control
+
+func _ready():
+	# Start hidden (Game mode)
+	visible = false
+	
+	# Connect the button signal manually since it is a dynamic child
+	var btn = get_node_or_null(\"ExitButton\")
+	if btn:
+		btn.pressed.connect(_on_exit_pressed)
+
+func _input(event):
+	# Toggle Menu on ESC
+	if event.is_action_pressed(\"ui_cancel\"):
+		visible = not visible
+		
+		if visible:
+			# Menu Mode: Show mouse
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		else:
+			# Game Mode: Capture mouse
+			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+			
+		# STOP the input from going to other scripts
+		get_viewport().set_input_as_handled()
+
+func _on_exit_pressed():
+	get_tree().quit()
+"
+
 [sub_resource type="GDScript" id="GDScript_compass"]
 script/source = "extends Control
 
@@ -699,37 +730,6 @@ func update_visuals():
 		else:
 			slot.color = Color(0.1, 0.1, 0.1, 0.6) # Dim inactive slots
 			if border: border.visible = false
-"
-
-[sub_resource type="GDScript" id="GDScript_menu_logic"]
-script/source = "extends Control
-
-func _ready():
-	# Start hidden (Game mode)
-	visible = false
-	
-	# Connect the button signal manually since it is a dynamic child
-	var btn = get_node_or_null(\"ExitButton\")
-	if btn:
-		btn.pressed.connect(_on_exit_pressed)
-
-func _input(event):
-	# Toggle Menu on ESC
-	if event.is_action_pressed(\"ui_cancel\"):
-		visible = not visible
-		
-		if visible:
-			# Menu Mode: Show mouse
-			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-		else:
-			# Game Mode: Capture mouse
-			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-			
-		# STOP the input from going to other scripts
-		get_viewport().set_input_as_handled()
-
-func _on_exit_pressed():
-	get_tree().quit()
 "
 
 [node name="Node3D" type="Node3D"]
@@ -932,17 +932,10 @@ Left Mouse: Place                         Right Mouse: Remove"
 
 [node name="ExitButton" type="Button" parent="PlayerCharacter3D/CanvasLayer/ESCMainMenu"]
 layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -100.0
-offset_top = -200.0
-offset_right = 100.0
-offset_bottom = -150.0
-grow_horizontal = 2
-grow_vertical = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 220.0
+offset_bottom = 70.0
 text = "EXIT GAME"
 
 [node name="CompassBar" type="Control" parent="PlayerCharacter3D/CanvasLayer"]
