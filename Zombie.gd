@@ -10,14 +10,20 @@ var current_health: int
 # --- State ---
 var current_state = "IDLE"
 var wander_timer: float = 0.0
+var attack_timer: float = 0.0 # Cooldown
 
 # --- Movement ---
 @export var move_speed: float = 1.0
 @export var gravity: float = 9.8
 @export var friction: float = 10.0
 
+var skeleton: Skeleton3D
+
 func _ready():
 	current_health = max_health
+	
+	# Find Skeleton recursively
+	skeleton = find_skeleton($"Sketchfab_Scene zombie")
 	
 	# Setup Wall Detector
 	var wall_detector = RayCast3D.new()
@@ -38,6 +44,14 @@ func _ready():
 	await get_tree().create_timer(0.5).timeout
 	set_physics_process(true)
 	change_state("IDLE")
+
+func find_skeleton(node: Node) -> Skeleton3D:
+	if node is Skeleton3D:
+		return node
+	for child in node.get_children():
+		var res = find_skeleton(child)
+		if res: return res
+	return null
 
 func _physics_process(delta):
 	if current_state == "DEAD":
@@ -67,6 +81,11 @@ func _physics_process(delta):
 			pick_random_direction()
 			change_state("WALK")
 			
+		# Check for player
+		var player = get_node_or_null("/root/Node3D/PlayerCharacter3D")
+		if player and global_position.distance_to(player.global_position) < 15.0:
+			change_state("CHASE")
+			
 	elif current_state == "WALK":
 		var forward_dir = transform.basis.z.normalized()
 		velocity.x = forward_dir.x * move_speed
@@ -77,6 +96,44 @@ func _physics_process(delta):
 		var wd = get_node_or_null("WallDetector")
 		if (wd and wd.is_colliding()) or wander_timer <= 0:
 			change_state("IDLE")
+			
+		# Check for player
+		var player = get_node_or_null("/root/Node3D/PlayerCharacter3D")
+		if player and global_position.distance_to(player.global_position) < 15.0:
+			change_state("CHASE")
+
+	elif current_state == "CHASE":
+		var player = get_node_or_null("/root/Node3D/PlayerCharacter3D")
+		if player:
+			var dist = global_position.distance_to(player.global_position)
+			if dist > 20.0:
+				change_state("IDLE") # Lost him
+			elif dist < 1.5:
+				# Attack Range
+				velocity = Vector3.ZERO
+				attack_timer -= delta
+				if attack_timer <= 0:
+					attack(player)
+					attack_timer = 1.0
+			else:
+				# Run towards player
+				look_at(Vector3(player.global_position.x, global_position.y, player.global_position.z), Vector3.UP)
+				# Rotating 180 because model might be facing wrong way? 
+				# The wander logic uses +Z as forward. `look_at` points -Z towards target.
+				# Let's assume standard Godot: -Z is forward.
+				# If wander logic `transform.basis.z` works, then Z is forward?
+				# Actually, `look_at` points -Z. 
+				# Let's check model. Usually mixamo is +Z.
+				rotate_y(PI) # Fix rotation if needed
+				
+				var dir = (player.global_position - global_position).normalized()
+				velocity.x = dir.x * (move_speed * 2.5) # Run fast
+				velocity.z = dir.z * (move_speed * 2.5)
+				
+				if anim_player:
+					# Speed up animation for running?
+					if anim_player.current_animation == "Take 001":
+						pass # It's the only animation we have
 
 	move_and_slide()
 	
@@ -98,6 +155,12 @@ func change_state(new_state):
 
 func pick_random_direction():
 	rotate_y(deg_to_rad(randf_range(90, 270)))
+
+func attack(player):
+	# Simple attack
+	print("Zombie Attacked Player!")
+	if player.has_method("take_damage"):
+		player.take_damage(1)
 
 # --- DAMAGE SYSTEM ---
 func take_damage(amount: int):
@@ -124,7 +187,7 @@ func die():
 		anim_player.play("Take 001")
 		anim_player.seek(9.5, true) # Seek to death start
 		
-		# Wait for the death animation slice (0.9s as requested)
+		# Play the death slice
 		await get_tree().create_timer(0.9).timeout
 		anim_player.pause() # Stop at the end frame
 	

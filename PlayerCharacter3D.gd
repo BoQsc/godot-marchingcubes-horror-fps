@@ -15,6 +15,9 @@ var original_fog_enabled: bool = false
 var original_fog_color: Color
 var original_fog_density: float
 
+var health: int = 10
+var max_health: int = 10
+
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
@@ -25,6 +28,29 @@ func _ready():
 		original_fog_enabled = environment.fog_enabled
 		original_fog_color = environment.fog_light_color
 		original_fog_density = environment.fog_density
+		
+	update_health_ui()
+
+func take_damage(amount: int):
+	health -= amount
+	update_health_ui()
+	
+	if health <= 0:
+		die()
+
+func die():
+	# Simple respawn
+	get_tree().reload_current_scene()
+
+func update_health_ui():
+	var health_bar = get_node_or_null("/root/Node3D/CanvasLayer/HUDToolbelt/HealthBar")
+	if health_bar:
+		# Assume initial width is full health. 
+		# Wait, HealthBar is a ColorRect. We can scale its x-size or pivot.
+		# Or better, set its anchor_right.
+		var pct = float(health) / float(max_health)
+		# HealthBar was anchor_right=1.0. We can change anchor_right to pct.
+		health_bar.anchor_right = pct
 
 func _unhandled_input(event):
 	if event is InputEventMouseMotion:
