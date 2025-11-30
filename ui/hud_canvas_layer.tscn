@@ -1,0 +1,464 @@
+[gd_scene load_steps=4 format=3 uid="uid://bfoffh2qml1ba"]
+
+[ext_resource type="Script" uid="uid://cdnnqwu84x4af" path="res://ui/HUDCompassBar.tres.gd" id="1_jw0cn"]
+[ext_resource type="Script" uid="uid://fdhxaetxv7my" path="res://ui/HUDToolbelt.tres.gd" id="2_250i1"]
+
+[sub_resource type="GDScript" id="GDScript_time_system"]
+script/source = "extends Label
+
+var day: int = 1
+var hour: int = 13
+var minute: int = 0
+var timer: float = 0.0
+
+func _process(delta):
+	timer += delta
+	# Every 4 seconds
+	if timer >= 4.0:
+		timer = 0.0
+		advance_time()
+
+func advance_time():
+	# Increment minutes instead of hours
+	minute += 1
+	
+	if minute >= 60:
+		minute = 0
+		hour += 1
+	
+	if hour >= 24:
+		hour = 0
+		day += 1
+	
+	text = \"Day %d    %02d:%02d\" % [day, hour, minute]
+"
+
+[node name="HUDCanvasLayer" type="CanvasLayer"]
+
+[node name="HUDGameNameLabel" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="HUDGameNameLabel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Best game 3 - Press ESC for Main Menu"
+
+[node name="HUDCompassBar" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 20.0
+offset_right = 150.0
+offset_bottom = 60.0
+grow_horizontal = 2
+script = ExtResource("1_jw0cn")
+
+[node name="Background" type="ColorRect" parent="HUDCompassBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.392157)
+
+[node name="ClippedArea" type="Control" parent="HUDCompassBar"]
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HUDCompassBar/ClippedArea"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/separation = 0
+
+[node name="Indicator" type="ColorRect" parent="HUDCompassBar"]
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -1.0
+offset_right = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TimeLabel" type="Label" parent="HUDCompassBar"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -62.0
+offset_top = 5.0
+offset_right = 62.0
+offset_bottom = 28.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Day 1    13:00"
+horizontal_alignment = 1
+script = SubResource("GDScript_time_system")
+
+[node name="HUDToolbelt" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -225.0
+offset_top = -60.0
+offset_right = 225.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("2_250i1")
+
+[node name="XPBar" type="ColorRect" parent="HUDToolbelt"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = -10.0
+offset_bottom = -6.0
+grow_horizontal = 2
+color = Color(0.6, 0.2, 0.9, 1)
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HUDToolbelt"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="Slot0" type="ColorRect" parent="HUDToolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="HUDToolbelt/HBoxContainer/Slot0"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="HUDToolbelt/HBoxContainer/Slot0"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot1" type="ColorRect" parent="HUDToolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="HUDToolbelt/HBoxContainer/Slot1"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="HUDToolbelt/HBoxContainer/Slot1"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot2" type="ColorRect" parent="HUDToolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="HUDToolbelt/HBoxContainer/Slot2"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="HUDToolbelt/HBoxContainer/Slot2"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot3" type="ColorRect" parent="HUDToolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="HUDToolbelt/HBoxContainer/Slot3"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="HUDToolbelt/HBoxContainer/Slot3"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "4"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot4" type="ColorRect" parent="HUDToolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="HUDToolbelt/HBoxContainer/Slot4"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="HUDToolbelt/HBoxContainer/Slot4"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "5"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot5" type="ColorRect" parent="HUDToolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="HUDToolbelt/HBoxContainer/Slot5"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="HUDToolbelt/HBoxContainer/Slot5"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "6"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot6" type="ColorRect" parent="HUDToolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="HUDToolbelt/HBoxContainer/Slot6"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="HUDToolbelt/HBoxContainer/Slot6"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "7"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot7" type="ColorRect" parent="HUDToolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="HUDToolbelt/HBoxContainer/Slot7"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="HUDToolbelt/HBoxContainer/Slot7"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "8"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot8" type="ColorRect" parent="HUDToolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="HUDToolbelt/HBoxContainer/Slot8"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="HUDToolbelt/HBoxContainer/Slot8"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "9"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HealthBar" type="ColorRect" parent="HUDToolbelt"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 6.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0.9, 0.1, 0.1, 1)
