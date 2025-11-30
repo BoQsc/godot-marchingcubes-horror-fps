@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://c2pp8ci31jce2"]
+[gd_scene load_steps=21 format=3 uid="uid://c2pp8ci31jce2"]
 
 [ext_resource type="AudioStream" uid="uid://i6o3hrbi2ac2" path="res://music/mysterious-dark-background-310162.mp3" id="1_i5arm"]
 [ext_resource type="Script" path="res://Player.gd" id="1_player"]
@@ -545,6 +545,45 @@ func _play_random_sound():
 	play()
 "
 
+[sub_resource type="GDScript" id="GDScript_toolbelt"]
+script/source = "extends Control
+
+var current_slot = 0
+@onready var container = $HBoxContainer
+
+func _ready():
+	update_visuals()
+
+func _input(event):
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			current_slot = (current_slot - 1 + 9) % 9
+			update_visuals()
+		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			current_slot = (current_slot + 1) % 9
+			update_visuals()
+	
+	# Supports number keys 1-9
+	if event is InputEventKey and event.pressed:
+		if event.keycode >= KEY_1 and event.keycode <= KEY_9:
+			current_slot = event.keycode - KEY_1
+			update_visuals()
+
+func update_visuals():
+	if not container: return
+	
+	for i in range(container.get_child_count()):
+		var slot = container.get_child(i)
+		var border = slot.get_node_or_null(\"Border\")
+		
+		if i == current_slot:
+			slot.color = Color(0.3, 0.3, 0.3, 0.9) # Light up active slot
+			if border: border.visible = true
+		else:
+			slot.color = Color(0.1, 0.1, 0.1, 0.6) # Dim inactive slots
+			if border: border.visible = false
+"
+
 [node name="Node3D" type="Node3D"]
 
 [node name="CharacterBody3D4 its a tree" type="CharacterBody3D" parent="."]
@@ -653,3 +692,334 @@ Left Mouse: Sphere                         Right Mouse: Dig
 
                                       ALT:
 Left Mouse: Place                         Right Mouse: Remove"
+
+[node name="Toolbelt" type="Control" parent="PlayerCharacter3D/CanvasLayer"]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -225.0
+offset_top = -60.0
+offset_right = 225.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+script = SubResource("GDScript_toolbelt")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PlayerCharacter3D/CanvasLayer/Toolbelt"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="Slot0" type="ColorRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot0"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot0"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot1" type="ColorRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot1"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot1"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot2" type="ColorRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot2"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot2"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot3" type="ColorRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot3"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot3"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "4"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot4" type="ColorRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot4"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot4"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "5"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot5" type="ColorRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot5"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot5"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "6"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot6" type="ColorRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot6"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot6"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "7"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot7" type="ColorRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot7"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot7"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "8"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot8" type="ColorRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer"]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="Border" type="ReferenceRect" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot8"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1, 1, 1, 1)
+border_width = 2.0
+editor_only = false
+
+[node name="Label" type="Label" parent="PlayerCharacter3D/CanvasLayer/Toolbelt/HBoxContainer/Slot8"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "9"
+horizontal_alignment = 1
+vertical_alignment = 1
