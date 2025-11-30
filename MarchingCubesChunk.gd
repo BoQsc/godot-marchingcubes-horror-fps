@@ -17,16 +17,22 @@ const TRI_TABLE = [[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
 
 const GRASS_TEXTURE = preload("res://green-grass-texture.jpg")
 const ROAD_TEXTURE = preload("res://gravel-texture.jpg")
+const SAND_TEXTURE = preload("res://sand-texture.jpg")
+const ROCK_TEXTURE = preload("res://rocky-texture.jpg")
+const SNOW_TEXTURE = preload("res://snow-texture.jpg")
+
 const TERRAIN_SHADER = preload("res://terrain.gdshader")
 const WATER_SHADER = preload("res://water.gdshader")
 
 func _ready():
-	# Terrain Material
 	var mat = ShaderMaterial.new()
 	mat.shader = TERRAIN_SHADER
 	mat.set_shader_parameter("grass_texture", GRASS_TEXTURE)
 	mat.set_shader_parameter("road_texture", ROAD_TEXTURE)
-	mat.set_shader_parameter("texture_scale", 1)
+	mat.set_shader_parameter("sand_texture", SAND_TEXTURE)
+	mat.set_shader_parameter("rock_texture", ROCK_TEXTURE)
+	mat.set_shader_parameter("snow_texture", SNOW_TEXTURE)
+	mat.set_shader_parameter("texture_scale", 0.5) # Adjusted scale for better tiling
 	self.material_override = mat
 	
 	# Water Plane

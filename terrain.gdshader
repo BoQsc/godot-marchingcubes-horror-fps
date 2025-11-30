@@ -1,35 +1,80 @@
 shader_type spatial;
 
-uniform sampler2D grass_texture : source_color;
-uniform sampler2D road_texture : source_color;
+// Textures
+uniform sampler2D grass_texture : source_color, filter_linear_mipmap_anisotropic;
+uniform sampler2D road_texture : source_color, filter_linear_mipmap_anisotropic;
+uniform sampler2D sand_texture : source_color, filter_linear_mipmap_anisotropic;
+uniform sampler2D rock_texture : source_color, filter_linear_mipmap_anisotropic;
+uniform sampler2D snow_texture : source_color, filter_linear_mipmap_anisotropic;
+
 uniform float texture_scale = 0.1;
 
+// Varyings passed from vertex to fragment
 varying float road_weight;
 varying vec3 uv1_power_normal;
 varying vec3 uv1_triplanar_pos;
+varying float height;
 
 void vertex() {
     road_weight = COLOR.r;
     
-    // Triplanar mapping setup
+    // Triplanar setup
     vec3 normal = normalize(NORMAL);
-    uv1_power_normal = pow(abs(normal), vec3(1.0)); // Sharpness
+    // Higher power = sharper transitions between x/y/z planar projections
+    uv1_power_normal = pow(abs(normal), vec3(4.0));
     uv1_power_normal /= dot(uv1_power_normal, vec3(1.0));
-    uv1_triplanar_pos = VERTEX * texture_scale; // World position scale
+    
+    // World position for texture mapping
+    uv1_triplanar_pos = VERTEX * texture_scale;
+    
+    // Pass global height
+    height = (MODEL_MATRIX * vec4(VERTEX, 1.0)).y;
 }
 
 vec4 triplanar_texture(sampler2D p_sampler, vec3 p_weights, vec3 p_triplanar_pos) {
     vec4 samp = vec4(0.0);
-    samp += texture(p_sampler, p_triplanar_pos.xy) * p_weights.z;
-    samp += texture(p_sampler, p_triplanar_pos.xz) * p_weights.y;
-    samp += texture(p_sampler, p_triplanar_pos.zy * vec2(-1.0, 1.0)) * p_weights.x;
+    samp += texture(p_sampler, p_triplanar_pos.xy) * p_weights.z; // Top/Bottom
+    samp += texture(p_sampler, p_triplanar_pos.xz) * p_weights.y; // Front/Back
+    samp += texture(p_sampler, p_triplanar_pos.zy * vec2(-1.0, 1.0)) * p_weights.x; // Left/Right
     return samp;
 }
 
 void fragment() {
-    vec4 grass = triplanar_texture(grass_texture, uv1_power_normal, uv1_triplanar_pos);
-    vec4 road = triplanar_texture(road_texture, uv1_power_normal, uv1_triplanar_pos);
+    // Sample all textures
+    vec3 grass = triplanar_texture(grass_texture, uv1_power_normal, uv1_triplanar_pos).rgb;
+    vec3 road = triplanar_texture(road_texture, uv1_power_normal, uv1_triplanar_pos).rgb;
+    vec3 sand = triplanar_texture(sand_texture, uv1_power_normal, uv1_triplanar_pos).rgb;
+    vec3 rock = triplanar_texture(rock_texture, uv1_power_normal, uv1_triplanar_pos).rgb;
+    vec3 snow = triplanar_texture(snow_texture, uv1_power_normal, uv1_triplanar_pos).rgb;
+
+    vec3 final_albedo = grass;
+
+    // 1. Height Mixing (Sand vs Grass vs Snow)
+    // Water is usually around 15.0. Beach up to 18.0.
+    float sand_factor = 1.0 - smoothstep(15.0, 19.0, height);
+    final_albedo = mix(final_albedo, sand, sand_factor);
+
+    // Snow starts at 50, fully snow by 70
+    float snow_factor = smoothstep(50.0, 70.0, height);
+    final_albedo = mix(final_albedo, snow, snow_factor);
+
+    // 2. Slope Mixing (Rock)
+    // Standard up-facing normal.y is 1.0. Vertical is 0.0.
+    // We want rock on steep slopes (y < 0.7ish)
+    float slope = normalize(NORMAL).y;
+    float rock_factor = 1.0 - smoothstep(0.5, 0.8, slope);
     
-    ALBEDO = mix(grass.rgb, road.rgb, road_weight);
-    ROUGHNESS = 0.8;
+    // Rock overrides sand/grass/snow
+    final_albedo = mix(final_albedo, rock, rock_factor);
+
+    // 3. Road Overlay (Man-made overrides everything)
+    final_albedo = mix(final_albedo, road, road_weight);
+
+    ALBEDO = final_albedo;
+    ROUGHNESS = 0.9;
+    
+    // Simple specular adjustment
+    if (sand_factor > 0.5 && road_weight < 0.1) {
+        ROUGHNESS = 0.6; // Wet sand look
+    }
 }
