@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://c2pp8ci31jce2"]
+[gd_scene load_steps=22 format=3 uid="uid://c2pp8ci31jce2"]
 
 [ext_resource type="AudioStream" uid="uid://i6o3hrbi2ac2" path="res://music/mysterious-dark-background-310162.mp3" id="1_i5arm"]
 [ext_resource type="Script" path="res://Player.gd" id="1_player"]
@@ -456,10 +456,6 @@ func spawn_build_effect(pos):
 	get_tree().root.add_child(mesh_instance)
 	mesh_instance.global_position = pos
 
-	await get_tree().create_timer(0.5).timeout
-	if is_instance_valid(mesh_instance):
-		mesh_instance.queue_free()
-
 func place_block():
 	var camera = get_viewport().get_camera_3d()
 	if not camera: return
@@ -584,6 +580,59 @@ func update_visuals():
 			if border: border.visible = false
 "
 
+[sub_resource type="GDScript" id="GDScript_compass"]
+script/source = "extends Control
+
+@onready var container = $ClippedArea/HBoxContainer
+# Width in pixels between each 45-degree increment (N to NE)
+const PX_PER_SECTION = 150.0 
+
+func _ready():
+	# Populate the compass strip
+	# Sequence: N NE E SE S SW W NW (Repeat N NE E SE to allow smooth looping)
+	var directions = [\"N\", \"NE\", \"E\", \"SE\", \"S\", \"SW\", \"W\", \"NW\", \"N\", \"NE\", \"E\", \"SE\"]
+	
+	for dir in directions:
+		var lbl = Label.new()
+		lbl.text = dir
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		
+		# Set fixed width for predictable sliding
+		lbl.custom_minimum_size.x = PX_PER_SECTION
+		lbl.custom_minimum_size.y = 40
+		
+		container.add_child(lbl)
+
+func _process(delta):
+	var cam = get_viewport().get_camera_3d()
+	if not cam: return
+	
+	var angle = fmod(cam.global_rotation_degrees.y, 360.0)
+	if angle < 0: angle += 360.0
+	
+	# Calculate offset
+	# 360 degrees = 8 sections * PX_PER_SECTION
+	# angle / 45.0 gives us how many 'sections' we have rotated
+	
+	var offset = (angle / 45.0) * PX_PER_SECTION
+	
+	# Apply offset to the container. 
+	# We center the 'N' (first element) at angle 0.
+	# The Container is centered in the parent Control.
+	# We shift left as angle increases.
+	
+	# Offset correction:
+	# The HBoxContainer starts at x=0 inside ClippedArea.
+	# We want index 0 (\"N\") to be centered in ClippedArea (width=300).
+	# So \"N\" center is at x=75 (half of 150).
+	# We want that x=75 to coincide with ClippedArea center (x=150).
+	# So initial start position of container should be +75.
+	
+	var start_x = 75.0 
+	container.position.x = start_x - offset
+"
+
 [node name="Node3D" type="Node3D"]
 
 [node name="CharacterBody3D4 its a tree" type="CharacterBody3D" parent="."]
@@ -692,6 +741,53 @@ Left Mouse: Sphere                         Right Mouse: Dig
 
                                       ALT:
 Left Mouse: Place                         Right Mouse: Remove"
+
+[node name="CompassBar" type="Control" parent="PlayerCharacter3D/CanvasLayer"]
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 20.0
+offset_right = 150.0
+offset_bottom = 60.0
+grow_horizontal = 2
+script = SubResource("GDScript_compass")
+
+[node name="Background" type="ColorRect" parent="PlayerCharacter3D/CanvasLayer/CompassBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.392157)
+
+[node name="ClippedArea" type="Control" parent="PlayerCharacter3D/CanvasLayer/CompassBar"]
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PlayerCharacter3D/CanvasLayer/CompassBar/ClippedArea"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/separation = 0
+
+[node name="Indicator" type="ColorRect" parent="PlayerCharacter3D/CanvasLayer/CompassBar"]
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -1.0
+offset_right = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Toolbelt" type="Control" parent="PlayerCharacter3D/CanvasLayer"]
 layout_mode = 3
