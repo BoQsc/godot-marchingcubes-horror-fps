@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://b8j2q4x5y607" path="res://MarchingCubesChunk.tscn" id="3_chunk"]
 [ext_resource type="PackedScene" uid="uid://o6xj2jdgavj" path="res://male_zombie.glb" id="3_jka67"]
 [ext_resource type="PackedScene" uid="uid://1xh5cq6f56t3" path="res://heavy_pistol_animated.glb" id="4_r3fl7"]
+[ext_resource type="Script" uid="uid://dn62uutrsxi6o" path="res://ui/ESCMainMenu.tres.gd" id="8_6iypd"]
 
 [sub_resource type="GDScript" id="GDScript_4arys"]
 script/source = "extends CharacterBody3D
@@ -342,37 +343,6 @@ func update_visuals():
 		else:
 			slot.color = Color(0.1, 0.1, 0.1, 0.6) # Dim inactive slots
 			if border: border.visible = false
-"
-
-[sub_resource type="GDScript" id="GDScript_menu_logic"]
-script/source = "extends Control
-
-func _ready():
-	# Start hidden (Game mode)
-	visible = false
-	
-	# Connect the button signal manually since it is a dynamic child
-	var btn = get_node_or_null(\"ExitButton\")
-	if btn:
-		btn.pressed.connect(_on_exit_pressed)
-
-func _input(event):
-	# Toggle Menu on ESC
-	if event.is_action_pressed(\"ui_cancel\"):
-		visible = not visible
-		
-		if visible:
-			# Menu Mode: Show mouse
-			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-		else:
-			# Game Mode: Capture mouse
-			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-			
-		# STOP the input from going to other scripts
-		get_viewport().set_input_as_handled()
-
-func _on_exit_pressed():
-	get_tree().quit()
 "
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_noarx"]
@@ -1296,7 +1266,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = SubResource("GDScript_menu_logic")
+script = ExtResource("8_6iypd")
 
 [node name="Label2" type="Label" parent="CanvasLayer2/ESCMainMenu"]
 layout_mode = 1
