@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://c2pp8ci31jce2"]
+[gd_scene load_steps=33 format=3 uid="uid://c2pp8ci31jce2"]
 
 [ext_resource type="AudioStream" uid="uid://i6o3hrbi2ac2" path="res://music/mysterious-dark-background-310162.mp3" id="1_i5arm"]
 [ext_resource type="PackedScene" uid="uid://ceaj1g6o3ms5k" path="res://props/grass plants 0/grass.glb" id="1_jsk3o"]
@@ -14,6 +14,7 @@
 [ext_resource type="Script" uid="uid://cdnnqwu84x4af" path="res://ui/HUDCompassBar.tres.gd" id="8_tereu"]
 [ext_resource type="Script" uid="uid://fdhxaetxv7my" path="res://ui/HUDToolbelt.tres.gd" id="9_cdqbm"]
 [ext_resource type="Script" uid="uid://dlmh64v2rdria" path="res://scripts/PlayerCharacter3D/Camera3D/Camera3D.tres.gd" id="13_3v7ru"]
+[ext_resource type="PackedScene" uid="uid://block123456" path="res://Block.tscn" id="13_tuemg"]
 [ext_resource type="Texture2D" uid="uid://cnvn56qv42mna" path="res://wood-block-texture.png" id="14_tuemg"]
 [ext_resource type="Script" uid="uid://dqeasbft388tr" path="res://scripts/PlayerCharacter3D/Camera3D/Sketchfab_Scene.tres.gd" id="15_tcnuu"]
 [ext_resource type="Script" uid="uid://bbf8dh10xrf1r" path="res://scripts/PlayerCharacter3D/AudioStreamPlayer3D.tres.gd" id="16_tcnuu"]
@@ -403,6 +404,39 @@ custom_minimum_size = Vector2(45, 45)
 layout_mode = 2
 color = Color(0.1, 0.1, 0.1, 0.5)
 
+[node name="SubViewportContainer" type="SubViewportContainer" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot0"]
+layout_mode = 0
+offset_top = 5.0000005
+offset_right = 40.0
+offset_bottom = 45.0
+scale = Vector2(0.087727554, 0.07450444)
+
+[node name="SubViewport2" type="SubViewport" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot0/SubViewportContainer"]
+transparent_bg = true
+handle_input_locally = false
+render_target_update_mode = 4
+
+[node name="Node3D" type="Node3D" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot0/SubViewportContainer/SubViewport2"]
+
+[node name="Block" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot0/SubViewportContainer/SubViewport2/Node3D" instance=ExtResource("13_tuemg")]
+visible = false
+
+[node name="Sketchfab_Scene" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot0/SubViewportContainer/SubViewport2/Node3D" instance=ExtResource("4_r3fl7")]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, -0.012232065, -0.5681894, -1.6534061)
+
+[node name="Skeleton3D" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot0/SubViewportContainer/SubViewport2/Node3D/Sketchfab_Scene/Sketchfab_model/b0ddfa12fbdb4db0b43ec3e5349b7ed2_fbx/Object_2/RootNode/Object_4" index="0"]
+visible = false
+
+[node name="Camera3D" type="Camera3D" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot0/SubViewportContainer/SubViewport2/Node3D"]
+transform = Transform3D(0.78166896, 0.26932117, -0.5625476, 0.04761558, 0.87356, 0.4843818, 0.6218734, -0.40541223, 0.67001086, -0.8071161, 0.74771434, 1.0134968)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot0/SubViewportContainer/SubViewport2/Node3D"]
+environment = SubResource("Environment_noarx")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot0/SubViewportContainer/SubViewport2/Node3D"]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
 [node name="Border" type="ReferenceRect" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot0"]
 visible = false
 layout_mode = 1
@@ -436,6 +470,32 @@ vertical_alignment = 1
 custom_minimum_size = Vector2(45, 45)
 layout_mode = 2
 color = Color(0.1, 0.1, 0.1, 0.5)
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot1"]
+layout_mode = 0
+offset_right = 512.0
+offset_bottom = 512.0
+scale = Vector2(0.08743307, 0.08518973)
+
+[node name="SubViewport" type="SubViewport" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot1/SubViewportContainer"]
+own_world_3d = true
+transparent_bg = true
+handle_input_locally = false
+render_target_update_mode = 4
+
+[node name="Node3D" type="Node3D" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot1/SubViewportContainer/SubViewport"]
+
+[node name="Block" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot1/SubViewportContainer/SubViewport/Node3D" instance=ExtResource("13_tuemg")]
+
+[node name="Camera3D" type="Camera3D" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot1/SubViewportContainer/SubViewport/Node3D"]
+transform = Transform3D(0.78166896, 0.26932117, -0.5625476, 0.04761558, 0.87356, 0.4843818, 0.6218734, -0.40541223, 0.67001086, -0.8071161, 0.74771434, 1.0134968)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot1/SubViewportContainer/SubViewport/Node3D"]
+environment = SubResource("Environment_noarx")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot1/SubViewportContainer/SubViewport/Node3D"]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
 
 [node name="Border" type="ReferenceRect" parent="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot1"]
 visible = false
@@ -793,3 +853,5 @@ script = ExtResource("15_tcnuu")
 
 [node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="PlayerCharacter3D"]
 script = ExtResource("16_tcnuu")
+
+[editable path="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot0/SubViewportContainer/SubViewport2/Node3D/Sketchfab_Scene"]
