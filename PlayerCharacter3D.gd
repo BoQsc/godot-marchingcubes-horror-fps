@@ -16,7 +16,7 @@ const WATER_LEVEL = 15.0
 
 var pistol_origin: Vector3
 # ADS Position: Centered X, slightly higher Y
-var ads_origin: Vector3 = Vector3(0.0, -0.06, -0.15)
+var ads_origin: Vector3 = Vector3(0.03, -0.06, -0.15)
 var block_origin: Vector3
 var mouse_input: Vector2
 var sway_time: float = 0.0
