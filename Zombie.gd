@@ -21,6 +21,7 @@ var skeleton: Skeleton3D
 
 func _ready():
 	current_health = max_health
+	add_to_group("zombies") # Add to zombies group
 	
 	# Find Skeleton recursively
 	skeleton = find_skeleton($"Sketchfab_Scene zombie")
@@ -45,6 +46,11 @@ func _ready():
 	set_physics_process(true)
 	
 	change_state("IDLE")
+
+func start_chase():
+	print("Zombie start_chase() called!")
+	if current_state != "DEAD":
+		change_state("CHASE")
 
 func find_skeleton(node: Node) -> Skeleton3D:
 	if node is Skeleton3D:
@@ -111,7 +117,7 @@ func _physics_process(delta):
 		var player = get_node_or_null("/root/Node3D/PlayerCharacter3D")
 		if player:
 			var dist = global_position.distance_to(player.global_position)
-			if dist > 20.0:
+			if dist > 50.0:
 				change_state("IDLE")
 			elif dist < 1.5:
 				change_state("ATTACK")

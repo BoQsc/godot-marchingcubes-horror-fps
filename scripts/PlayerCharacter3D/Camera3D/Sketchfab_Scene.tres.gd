@@ -219,7 +219,10 @@ func fire_raycast():
 	var result = space_state.intersect_ray(query)
 	
 	if result:
-		if result.collider.is_in_group("blocks") and result.collider.has_method("take_damage"):
+		if result.collider.is_in_group("zombies") and result.collider.has_method("take_damage") and result.collider.has_method("start_chase"):
+			result.collider.take_damage(1)
+			result.collider.start_chase()
+		elif result.collider.is_in_group("blocks") and result.collider.has_method("take_damage"):
 			result.collider.take_damage(1)
 		else:
 			# Micro-digging on terrain
