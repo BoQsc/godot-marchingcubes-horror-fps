@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://c2pp8ci31jce2"]
+[gd_scene load_steps=29 format=3 uid="uid://c2pp8ci31jce2"]
 
 [ext_resource type="AudioStream" uid="uid://i6o3hrbi2ac2" path="res://music/mysterious-dark-background-310162.mp3" id="1_i5arm"]
 [ext_resource type="PackedScene" uid="uid://ceaj1g6o3ms5k" path="res://props/grass plants 0/grass.glb" id="1_jsk3o"]
@@ -14,6 +14,7 @@
 [ext_resource type="Script" uid="uid://cdnnqwu84x4af" path="res://ui/HUDCompassBar.tres.gd" id="8_tereu"]
 [ext_resource type="Script" uid="uid://fdhxaetxv7my" path="res://ui/HUDToolbelt.tres.gd" id="9_cdqbm"]
 [ext_resource type="Script" uid="uid://dlmh64v2rdria" path="res://scripts/PlayerCharacter3D/Camera3D/Camera3D.tres.gd" id="13_3v7ru"]
+[ext_resource type="PackedScene" uid="uid://block123456" path="res://Block.tscn" id="13_tuemg"]
 [ext_resource type="Script" uid="uid://dqeasbft388tr" path="res://scripts/PlayerCharacter3D/Camera3D/Sketchfab_Scene.tres.gd" id="15_tcnuu"]
 [ext_resource type="Script" uid="uid://bbf8dh10xrf1r" path="res://scripts/PlayerCharacter3D/AudioStreamPlayer3D.tres.gd" id="16_tcnuu"]
 
@@ -767,8 +768,12 @@ mesh = SubResource("CapsuleMesh_noarx")
 shape = SubResource("CapsuleShape3D_a0tk4")
 
 [node name="Camera3D" type="Camera3D" parent="PlayerCharacter3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.49020386, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27548826, 0.40287018, -0.050864667)
 script = ExtResource("13_3v7ru")
+
+[node name="Block" parent="PlayerCharacter3D/Camera3D" instance=ExtResource("13_tuemg")]
+transform = Transform3D(0.22084568, 0, 0, 0, 0.31, 0, 0, 0, 0.2089067, 0.19500923, -0.19937134, -0.26929274)
+visible = false
 
 [node name="Sketchfab_Scene" parent="PlayerCharacter3D/Camera3D" instance=ExtResource("4_r3fl7")]
 transform = Transform3D(-0.0049240384, 0, 0.0008682415, 0, 0.005, 0, -0.0008682415, 0, -0.0049240384, 0.09346646, -0.09446716, -0.15498024)
