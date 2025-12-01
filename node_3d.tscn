@@ -921,7 +921,6 @@ surface_material_override/0 = SubResource("StandardMaterial3D_1")
 
 [node name="Sketchfab_Scene" parent="PlayerCharacter3D/Camera3D" instance=ExtResource("4_r3fl7")]
 transform = Transform3D(-0.0049240384, 0, 0.0008682415, 0, 0.005, 0, -0.0008682415, 0, -0.0049240384, 0.09346646, -0.09446716, -0.15498024)
-visible = false
 script = ExtResource("15_tcnuu")
 
 [node name="Sketchfab_Scene2 handsfists" parent="PlayerCharacter3D/Camera3D" instance=ExtResource("19_jsnrv")]
