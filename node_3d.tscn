@@ -258,33 +258,36 @@ chunk_scene = ExtResource("3_chunk")
 player = NodePath("../PlayerCharacter3D")
 
 [node name="CharacterBody3D its a zombie" type="CharacterBody3D" parent="." groups=["blocks"]]
-transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 106.177025, -13.805143)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 106.177025, -13.805143)
 script = ExtResource("5_zombie")
 
 [node name="Sketchfab_Scene zombie" parent="CharacterBody3D its a zombie" instance=ExtResource("3_jka67")]
+transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D its a zombie"]
-transform = Transform3D(0.05, 0, 0, 0, 0.085, 0, 0, 0, 0.01, 0, 0.08586693, 0)
+transform = Transform3D(0.5, 0, 0, 0, 0.8, 0, 0, 0, 0.5, 0, 0.8, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
 [node name="CharacterBody3D2 its a zombie" type="CharacterBody3D" parent="." groups=["blocks"]]
-transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0.667415, 106.177025, -13.805143)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.667415, 106.177025, -13.805143)
 script = ExtResource("5_zombie")
 
 [node name="Sketchfab_Scene zombie" parent="CharacterBody3D2 its a zombie" instance=ExtResource("3_jka67")]
+transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D2 its a zombie"]
-transform = Transform3D(0.05, 0, 0, 0, 0.085, 0, 0, 0, 0.01, 0, 0.08586693, 0)
+transform = Transform3D(0.5, 0, 0, 0, 0.8, 0, 0, 0, 0.5, 0, 0.8, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
 [node name="CharacterBody3D3 its a zombie" type="CharacterBody3D" parent="." groups=["blocks"]]
-transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, -0.608122, 106.177025, -13.805143)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.608122, 106.177025, -13.805143)
 script = ExtResource("5_zombie")
 
 [node name="Sketchfab_Scene zombie" parent="CharacterBody3D3 its a zombie" instance=ExtResource("3_jka67")]
+transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D3 its a zombie"]
-transform = Transform3D(0.05, 0, 0, 0, 0.085, 0, 0, 0, 0.01, 0, 0.08586693, 0)
+transform = Transform3D(0.5, 0, 0, 0, 0.8, 0, 0, 0, 0.5, 0, 0.8, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
 [node name="ESCCanvasLayer" type="CanvasLayer" parent="."]
