@@ -15,9 +15,12 @@ const WATER_LEVEL = 15.0
 @onready var block_holding = $"Camera3D/MeshInstance3D BlockHolding"
 
 var pistol_origin: Vector3
+# ADS Position: Centered X, slightly higher Y
+var ads_origin: Vector3 = Vector3(0.0, -0.06, -0.15)
 var block_origin: Vector3
 var mouse_input: Vector2
 var sway_time: float = 0.0
+var current_slot: int = 0
 
 # Sway Settings
 const SWAY_AMOUNT = 0.002      # How much mouse movement affects position
@@ -59,11 +62,24 @@ func _process(delta):
 	handle_weapon_sway(delta)
 
 func handle_weapon_sway(delta):
+	# Determine Aiming State (Only for Pistol / Slot 0)
+	var is_aiming = false
+	var target_pistol_origin = pistol_origin
+	
+	if current_slot == 0 and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+		# Check if we are NOT holding modifier keys (modifiers trigger tools)
+		if not Input.is_key_pressed(KEY_CTRL) and not Input.is_key_pressed(KEY_SHIFT):
+			is_aiming = true
+			target_pistol_origin = ads_origin
+	
 	# 1. Mouse Sway (Lag)
+	# Reduce sway significantly while aiming
+	var current_sway_amount = SWAY_AMOUNT * 0.1 if is_aiming else SWAY_AMOUNT
+	
 	# Invert mouse input for drag effect
 	var target_sway = Vector3(
-		-mouse_input.x * SWAY_AMOUNT,
-		mouse_input.y * SWAY_AMOUNT,
+		-mouse_input.x * current_sway_amount,
+		mouse_input.y * current_sway_amount,
 		0
 	)
 	
@@ -72,21 +88,27 @@ func handle_weapon_sway(delta):
 	var speed = velocity.length()
 	var bob_offset = Vector3.ZERO
 	
+	# Reduce bobbing while aiming
+	var current_bob_amp = BOB_AMP * 0.1 if is_aiming else BOB_AMP
+	
 	if is_on_floor() and speed > 1.0:
 		sway_time += delta * speed
-		bob_offset.y = sin(sway_time * BOB_FREQ * 0.5) * BOB_AMP
-		bob_offset.x = cos(sway_time * BOB_FREQ) * BOB_AMP * 0.5
+		bob_offset.y = sin(sway_time * BOB_FREQ * 0.5) * current_bob_amp
+		bob_offset.x = cos(sway_time * BOB_FREQ) * current_bob_amp * 0.5
 	else:
 		# Reset time gently or just leave it, snapping back is fine
 		pass
 
 	# Combine
-	var total_pistol_target = pistol_origin + target_sway + bob_offset
+	var total_pistol_target = target_pistol_origin + target_sway + bob_offset
 	var total_block_target = block_origin + target_sway + bob_offset
 	
 	# Apply with smoothing
+	# Use faster smoothing for ADS transition
+	var smooth_speed = 20.0 if is_aiming else SWAY_SMOOTHING
+	
 	if pistol:
-		pistol.position = pistol.position.lerp(total_pistol_target, delta * SWAY_SMOOTHING)
+		pistol.position = pistol.position.lerp(total_pistol_target, delta * smooth_speed)
 	if block_holding:
 		block_holding.position = block_holding.position.lerp(total_block_target, delta * SWAY_SMOOTHING)
 	
@@ -94,6 +116,7 @@ func handle_weapon_sway(delta):
 	mouse_input = Vector2.ZERO
 
 func _on_slot_changed(index):
+	current_slot = index
 	if index == 0:
 		# Pistol
 		if pistol: pistol.visible = true

@@ -155,12 +155,15 @@ func _input(event):
 				if current_slot == 1 or current_slot == 2:
 					remove_block()
 				else:
-					play_animation_segment()
+					# Pistol Logic
 					if Input.is_key_pressed(KEY_CTRL):
+						play_animation_segment()
 						fire_dig() # Ctrl + Right Click to dig terrain
 					elif Input.is_key_pressed(KEY_SHIFT):
+						play_animation_segment()
 						fire_road_paint(1.0)
-					# else: plain Right Click does nothing
+					# else: plain Right Click is now ADS (Aim Down Sights), handled in PlayerCharacter3D.gd
+					# We do NOT play the animation for ADS to keep the sight steady
 
 func play_animation_segment():
 	# Only play if pistol is active (Slot 0)
