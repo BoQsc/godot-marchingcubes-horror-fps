@@ -14,10 +14,13 @@ const WATER_LEVEL = 15.0
 @onready var pistol = $Camera3D/Sketchfab_Scene
 @onready var block_holding = $"Camera3D/MeshInstance3D BlockHolding"
 @onready var hands = $"Camera3D/Sketchfab_Scene2 handsfists"
+@onready var punch_sfx = $AudioStreamPlayerPunch
 
 var pistol_origin: Vector3
 var pistol_initial_rotation: Vector3
 var hands_origin: Vector3
+
+const PUNCH_SFX = preload("res://sfx/classic-punch-impact-352711.mp3")
 # ADS Position: Centered X, slightly higher Y
 @export var ads_origin: Vector3 = Vector3(0.002, -0.06, -0.19)
 @export var ads_rotation: Vector3 = Vector3(-0.955, 180.735, 0.0) # Default straight forward if model is standard
@@ -156,6 +159,10 @@ func handle_hands_actions(delta):
 		# Only play if not already playing punch to avoid restarting mid-punch
 		if anim_player.current_animation != "arms_armature|Combat_punch_right":
 			anim_player.play("arms_armature|Combat_punch_right")
+			if punch_sfx:
+				punch_sfx.stream = PUNCH_SFX
+				punch_sfx.pitch_scale = randf_range(0.9, 1.1)
+				punch_sfx.play()
 
 func _on_hands_animation_finished(anim_name):
 	if anim_name == "arms_armature|Combat_punch_right":

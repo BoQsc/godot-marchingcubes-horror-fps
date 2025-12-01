@@ -900,6 +900,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 107.50628, 0)
 floor_max_angle = 3.1415927
 script = ExtResource("1_player")
 
+[node name="AudioStreamPlayerPunch" type="AudioStreamPlayer3D" parent="PlayerCharacter3D"]
+
 [node name="MeshInstance3D" type="MeshInstance3D" parent="PlayerCharacter3D"]
 visible = false
 mesh = SubResource("CapsuleMesh_noarx")
