@@ -7,10 +7,15 @@ var current_health: int
 # --- References ---
 @onready var anim_player = $"Sketchfab_Scene zombie".find_child("AnimationPlayer")
 
+# --- Sound ---
+const CHASE_SOUND = preload("res://sfx/zombie-sound-2-357976.mp3")
+@onready var chase_audio_player: AudioStreamPlayer3D = AudioStreamPlayer3D.new()
+
 # --- State ---
 var current_state = "IDLE"
 var wander_timer: float = 0.0
 var attack_timer: float = 0.0 # Cooldown
+var stuck_timer: float = 0.0
 
 # --- Movement ---
 @export var move_speed: float = 1.0
@@ -22,6 +27,21 @@ var skeleton: Skeleton3D
 func _ready():
 	current_health = max_health
 	add_to_group("zombies") # Add to zombies group
+	
+	# Setup Chase Sound
+	add_child(chase_audio_player)
+	chase_audio_player.stream = CHASE_SOUND
+	chase_audio_player.volume_db = -5.0 # Slightly reduced volume
+	chase_audio_player.max_distance = 20.0 # Audible range
+	chase_audio_player.autoplay = false # Control manually
+	chase_audio_player.bus = "Master" # Ensure it uses a bus
+	
+	# Improve collision stability
+	safe_margin = 0.2 # Prevent snagging
+	wall_min_slide_angle = deg_to_rad(15) # Allows sliding on steep surfaces
+	# WARNING: Setting floor_max_angle to 180 degrees means ALL surfaces will be considered "floor".
+	# This can cause zombies to stick to walls, not fall down cliffs naturally, and break vertical movement.
+	floor_max_angle = deg_to_rad(180) 
 	
 	# Find Skeleton recursively
 	skeleton = find_skeleton($"Sketchfab_Scene zombie")
@@ -162,6 +182,13 @@ func _physics_process(delta):
 func change_state(new_state):
 	if current_state == "DEAD": return
 	current_state = new_state
+	
+	if new_state == "CHASE":
+		if not chase_audio_player.playing:
+			chase_audio_player.play()
+	else:
+		if chase_audio_player.playing:
+			chase_audio_player.stop()
 	
 	if anim_player:
 		if new_state == "IDLE": anim_player.seek(0.0)
