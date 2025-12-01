@@ -3,6 +3,9 @@ extends Node3D
 @onready var player = $PlayerCharacter3D
 @onready var terrain_manager = $TerrainManager
 @onready var loading_screen = $LoadingLayer
+@onready var bg_music_player = $AudioStreamPlayer
+
+const GAME_MUSIC = preload("res://sfx/forest-birds-55305.mp3")
 
 func _ready():
 	# Start in Loading State
@@ -32,6 +35,11 @@ func _on_terrain_ready():
 	# Enable Player
 	if player:
 		player.process_mode = Node.PROCESS_MODE_INHERIT
+		
+	# Switch to game music
+	if bg_music_player:
+		bg_music_player.stream = GAME_MUSIC
+		bg_music_player.play()
 		
 	# Capture Mouse for Gameplay
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
