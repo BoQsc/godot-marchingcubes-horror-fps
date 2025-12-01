@@ -4,12 +4,14 @@ extends Node3D
 const PISTOL_SOUND = preload("res://sfx/pistol-shot-233473.mp3")
 # Use preload for blocks too
 const BLOCK_SCENE = preload("res://Block.tscn")
+const RAMP_SCENE = preload("res://Block_ramp.tscn")
 
 # Reference to the AnimationPlayer child node
 @onready var animation_player = $AnimationPlayer
 
 # Variable to hold the dynamic audio player
 var audio_player: AudioStreamPlayer3D
+var current_slot: int = 0
 
 func _ready():
 	# 1. Setup Audio
@@ -21,6 +23,14 @@ func _ready():
 	
 	# 2. Setup Crosshair (UI)
 	setup_crosshair()
+	
+	# 3. Connect to Toolbelt
+	var toolbelt = get_node_or_null("/root/Node3D/HUDCanvasLayer/HUDToolbelt")
+	if toolbelt:
+		toolbelt.slot_changed.connect(_on_slot_changed)
+
+func _on_slot_changed(index):
+	current_slot = index
 
 func setup_crosshair():
 	# Create a canvas layer so the UI sits above the 3D world
@@ -49,29 +59,35 @@ func _input(event):
 	if event is InputEventMouseButton:
 		if event.pressed:
 			if event.button_index == MOUSE_BUTTON_LEFT:
-				if Input.is_key_pressed(KEY_ALT):
+				if current_slot == 1:
+					place_block(BLOCK_SCENE)
+				elif current_slot == 2:
+					place_block(RAMP_SCENE)
+				else:
+					# Pistol / Tool logic
 					play_animation_segment()
-					place_block() # Alt + Left Click to place object
-				elif Input.is_key_pressed(KEY_SHIFT):
-					play_animation_segment()
-					fire_build("box") # Shift + Left Click to place terrain block
-				elif Input.is_key_pressed(KEY_CTRL):
-					play_animation_segment()
-					fire_build("sphere") # Ctrl + Left Click to build organic
+					if Input.is_key_pressed(KEY_SHIFT):
+						fire_build("box") # Shift + Left Click to place terrain block
+					elif Input.is_key_pressed(KEY_CTRL):
+						fire_build("sphere") # Ctrl + Left Click to build organic
+					else:
+						fire_raycast() # Just Left Click to shoot
+
+			elif event.button_index == MOUSE_BUTTON_RIGHT:
+				if current_slot == 1 or current_slot == 2:
+					remove_block()
 				else:
 					play_animation_segment()
-					fire_raycast() # Just Left Click to shoot
-			elif event.button_index == MOUSE_BUTTON_RIGHT:
-				play_animation_segment()
-				if Input.is_key_pressed(KEY_ALT):
-					remove_block() # Alt + Right Click to remove object
-				elif Input.is_key_pressed(KEY_CTRL):
-					fire_dig() # Ctrl + Right Click to dig terrain
-				elif Input.is_key_pressed(KEY_SHIFT):
-					fire_road_paint(1.0)
-				# else: plain Right Click does nothing, freeing it up
+					if Input.is_key_pressed(KEY_CTRL):
+						fire_dig() # Ctrl + Right Click to dig terrain
+					elif Input.is_key_pressed(KEY_SHIFT):
+						fire_road_paint(1.0)
+					# else: plain Right Click does nothing
 
 func play_animation_segment():
+	# Only play if pistol is active (Slot 0)
+	if current_slot != 0: return
+
 	# check if the animation exists to avoid errors
 	if animation_player and animation_player.has_animation("allanims"):
 		animation_player.stop()
@@ -213,7 +229,7 @@ func spawn_build_effect(pos):
 	get_tree().root.add_child(mesh_instance)
 	mesh_instance.global_position = pos
 
-func place_block():
+func place_block(scene_to_place):
 	var camera = get_viewport().get_camera_3d()
 	if not camera: return
 	
@@ -228,8 +244,8 @@ func place_block():
 		var pos = result.position + result.normal * 0.5
 		var snapped_pos = pos.snapped(Vector3(1, 1, 1))
 		
-		if BLOCK_SCENE:
-			var block = BLOCK_SCENE.instantiate()
+		if scene_to_place:
+			var block = scene_to_place.instantiate()
 			get_tree().root.add_child(block)
 			block.global_position = snapped_pos
 
