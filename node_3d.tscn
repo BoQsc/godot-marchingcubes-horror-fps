@@ -1,5 +1,6 @@
 [gd_scene load_steps=33 format=3 uid="uid://c2pp8ci31jce2"]
 
+[ext_resource type="Script" path="res://MainGame.gd" id="1_main_game"]
 [ext_resource type="AudioStream" uid="uid://i6o3hrbi2ac2" path="res://music/mysterious-dark-background-310162.mp3" id="1_i5arm"]
 [ext_resource type="PackedScene" uid="uid://ceaj1g6o3ms5k" path="res://props/grass plants 0/grass.glb" id="1_jsk3o"]
 [ext_resource type="Script" path="res://PlayerCharacter3D.gd" id="1_player"]
@@ -165,6 +166,7 @@ albedo_texture = ExtResource("14_tuemg")
 albedo_color = Color(0.6, 0.4, 0.2, 1)
 
 [node name="Node3D" type="Node3D"]
+script = ExtResource("1_main_game")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("1_i5arm")
@@ -920,5 +922,32 @@ script = ExtResource("15_tcnuu")
 
 [node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="PlayerCharacter3D"]
 script = ExtResource("16_tcnuu")
+
+[node name="LoadingLayer" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="ColorRect" type="ColorRect" parent="LoadingLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Label" type="Label" parent="LoadingLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -58.5
+offset_top = -11.5
+offset_right = 58.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Loading Terrain..."
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [editable path="HUDCanvasLayer/HUDToolbelt/HBoxContainer/Slot0/SubViewportContainer/SubViewport2/Node3D/Sketchfab_Scene"]

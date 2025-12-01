@@ -332,7 +332,8 @@ func _generate(thread_ref):
 	call_deferred("_finalize_mesh", st.commit(), thread_ref)
 
 func _finalize_mesh(new_mesh, thread_ref):
-	thread_ref.wait_to_finish()
+	if thread_ref.is_started():
+		thread_ref.wait_to_finish()
 	self.mesh = new_mesh
 	
 	# Clear old collision shapes to prevent stacking/ghost collisions

@@ -22,11 +22,19 @@ func _ready():
 	noise.frequency = 0.02
 	noise.noise_type = FastNoiseLite.TYPE_PERLIN
 
+signal initial_generation_finished
+
+var initial_load_done: bool = false
+
 func _process(delta):
 	if not player: return
 	
 	update_chunks()
 	process_generation_queue()
+	
+	if not initial_load_done and not active_chunks.is_empty() and chunks_to_generate.is_empty() and current_active_tasks == 0:
+		initial_load_done = true
+		initial_generation_finished.emit()
 
 func update_chunks():
 	var p_pos = player.global_position
