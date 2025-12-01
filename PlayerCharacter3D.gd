@@ -30,6 +30,38 @@ func _ready():
 		original_fog_density = environment.fog_density
 		
 	update_health_ui()
+	
+	# Connect to Toolbelt
+	var toolbelt = get_node_or_null("/root/Node3D/HUDCanvasLayer/HUDToolbelt")
+	if toolbelt:
+		toolbelt.slot_changed.connect(_on_slot_changed)
+
+func _on_slot_changed(index):
+	var pistol = camera.get_node_or_null("Sketchfab_Scene")
+	var block_holding = camera.get_node_or_null("MeshInstance3D BlockHolding")
+	
+	if index == 0:
+		# Pistol
+		if pistol: pistol.visible = true
+		if block_holding: block_holding.visible = false
+	elif index == 1:
+		# Block (Box)
+		if pistol: pistol.visible = false
+		if block_holding:
+			block_holding.visible = true
+			block_holding.mesh = BoxMesh.new()
+	elif index == 2:
+		# Ramp (Prism)
+		if pistol: pistol.visible = false
+		if block_holding:
+			block_holding.visible = true
+			var prism = PrismMesh.new()
+			prism.left_to_right = 0.0 # Ramp shape
+			block_holding.mesh = prism
+	else:
+		# Nothing/Other
+		if pistol: pistol.visible = false
+		if block_holding: block_holding.visible = false
 
 func take_damage(amount: int):
 	health -= amount
