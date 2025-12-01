@@ -45,6 +45,8 @@ func _ready():
 	await get_tree().create_timer(0.5).timeout
 	set_physics_process(true)
 	
+	wall_min_slide_angle = deg_to_rad(60)
+	
 	change_state("IDLE")
 
 func start_chase():
@@ -69,6 +71,11 @@ func _physics_process(delta):
 		velocity.y -= gravity * delta
 	else:
 		velocity.y = -0.1
+		
+		# Step-Up Logic (Simple Hop)
+		# If we are moving and hit a wall, try to hop
+		if is_on_wall() and velocity.length() > 0.5:
+			velocity.y = 5.0
 
 	# --- ANIMATION LOGIC (Restored) ---
 	if anim_player:
