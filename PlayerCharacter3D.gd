@@ -15,8 +15,10 @@ const WATER_LEVEL = 15.0
 @onready var block_holding = $"Camera3D/MeshInstance3D BlockHolding"
 
 var pistol_origin: Vector3
+var pistol_initial_rotation: Vector3
 # ADS Position: Centered X, slightly higher Y
-@export var ads_origin: Vector3 = Vector3(0.03, -0.06, -0.15)
+@export var ads_origin: Vector3 = Vector3(0.002, -0.06, -0.19)
+@export var ads_rotation: Vector3 = Vector3(-0.955, 180.735, 0.0) # Default straight forward if model is standard
 @export var debug_keep_aim: bool = false
 var block_origin: Vector3
 var mouse_input: Vector2
@@ -41,7 +43,14 @@ func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
 	# Store initial positions for sway
-	if pistol: pistol_origin = pistol.position
+	if pistol: 
+		pistol_origin = pistol.position
+		pistol_initial_rotation = pistol.rotation_degrees
+		# Set default ads rotation to initial if not set, or maybe manually tune it
+		# Let's guess the model needs roughly 180 or 0. 
+		# Looking at the Transform3D in previous turn, it seemed complex.
+		# We'll stick to interpolation from initial.
+		
 	if block_holding: block_origin = block_holding.position
 	
 	# Get the WorldEnvironment from the scene root
@@ -66,12 +75,14 @@ func handle_weapon_sway(delta):
 	# Determine Aiming State (Only for Pistol / Slot 0)
 	var is_aiming = false
 	var target_pistol_origin = pistol_origin
+	var target_pistol_rotation = pistol_initial_rotation
 	
 	if debug_keep_aim or (current_slot == 0 and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)):
 		# Check if we are NOT holding modifier keys (modifiers trigger tools)
 		if debug_keep_aim or (not Input.is_key_pressed(KEY_CTRL) and not Input.is_key_pressed(KEY_SHIFT)):
 			is_aiming = true
 			target_pistol_origin = ads_origin
+			target_pistol_rotation = ads_rotation
 	
 	# 1. Mouse Sway (Lag)
 	# Reduce sway significantly while aiming
@@ -110,6 +121,8 @@ func handle_weapon_sway(delta):
 	
 	if pistol:
 		pistol.position = pistol.position.lerp(total_pistol_target, delta * smooth_speed)
+		pistol.rotation_degrees = pistol.rotation_degrees.lerp(target_pistol_rotation, delta * smooth_speed)
+		
 	if block_holding:
 		block_holding.position = block_holding.position.lerp(total_block_target, delta * SWAY_SMOOTHING)
 	
