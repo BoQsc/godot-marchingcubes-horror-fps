@@ -128,7 +128,7 @@ func _input(event):
 		return
 	
 	# Reload Input
-	if event.is_action_pressed("reload") or (event is InputEventKey and event.pressed and event.keycode == KEY_R):
+	if event is InputEventKey and event.pressed and event.keycode == KEY_R:
 		if current_slot == 0 and not is_reloading:
 			reload_pistol()
 
