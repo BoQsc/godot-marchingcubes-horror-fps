@@ -177,7 +177,7 @@ func play_animation_segment():
 		animation_player.play("allanims")
 		
 		# Create a temporary timer for 0.3 seconds and wait for it to finish
-		await get_tree().create_timer(0.3).timeout
+		await get_tree().create_timer(0.4).timeout
 		
 		# SAFETY CHECK: Ensure the node and player still exist after the wait
 		if is_instance_valid(animation_player):
