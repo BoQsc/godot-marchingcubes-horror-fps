@@ -13,9 +13,11 @@ const WATER_LEVEL = 15.0
 # Weapon Sway & Bobbing
 @onready var pistol = $Camera3D/Sketchfab_Scene
 @onready var block_holding = $"Camera3D/MeshInstance3D BlockHolding"
+@onready var hands = $"Camera3D/Sketchfab_Scene2 handsfists"
 
 var pistol_origin: Vector3
 var pistol_initial_rotation: Vector3
+var hands_origin: Vector3
 # ADS Position: Centered X, slightly higher Y
 @export var ads_origin: Vector3 = Vector3(0.002, -0.06, -0.19)
 @export var ads_rotation: Vector3 = Vector3(-0.955, 180.735, 0.0) # Default straight forward if model is standard
@@ -52,6 +54,7 @@ func _ready():
 		# We'll stick to interpolation from initial.
 		
 	if block_holding: block_origin = block_holding.position
+	if hands: hands_origin = hands.position
 	
 	# Get the WorldEnvironment from the scene root
 	var world_env = get_node("/root/Node3D/WorldEnvironment")
@@ -67,6 +70,8 @@ func _ready():
 	var toolbelt = get_node_or_null("/root/Node3D/HUDCanvasLayer/HUDToolbelt")
 	if toolbelt:
 		toolbelt.slot_changed.connect(_on_slot_changed)
+		# Force update for initial state
+		_on_slot_changed(0)
 
 func _process(delta):
 	handle_weapon_sway(delta)
@@ -114,6 +119,7 @@ func handle_weapon_sway(delta):
 	# Combine
 	var total_pistol_target = target_pistol_origin + target_sway + bob_offset
 	var total_block_target = block_origin + target_sway + bob_offset
+	var total_hands_target = hands_origin + target_sway + bob_offset
 	
 	# Apply with smoothing
 	# Use faster smoothing for ADS transition
@@ -125,6 +131,9 @@ func handle_weapon_sway(delta):
 		
 	if block_holding:
 		block_holding.position = block_holding.position.lerp(total_block_target, delta * SWAY_SMOOTHING)
+		
+	if hands:
+		hands.position = hands.position.lerp(total_hands_target, delta * SWAY_SMOOTHING)
 	
 	# Reset mouse input frame-by-frame (otherwise it drifts if no input)
 	mouse_input = Vector2.ZERO
@@ -135,12 +144,14 @@ func _on_slot_changed(index):
 		# Pistol
 		if pistol: pistol.visible = true
 		if block_holding: block_holding.visible = false
+		if hands: hands.visible = false
 	elif index == 1:
 		# Block (Box)
 		if pistol: pistol.visible = false
 		if block_holding:
 			block_holding.visible = true
 			block_holding.mesh = BoxMesh.new()
+		if hands: hands.visible = false
 	elif index == 2:
 		# Ramp (Prism)
 		if pistol: pistol.visible = false
@@ -149,10 +160,18 @@ func _on_slot_changed(index):
 			var prism = PrismMesh.new()
 			prism.left_to_right = 0.0 # Ramp shape
 			block_holding.mesh = prism
+		if hands: hands.visible = false
 	else:
-		# Nothing/Other
+		# Hands (Fists)
 		if pistol: pistol.visible = false
 		if block_holding: block_holding.visible = false
+		if hands:
+			hands.visible = true
+			var anim_player = hands.get_node_or_null("AnimationPlayer")
+			if anim_player:
+				# Use play() to start animation. If it's already playing, this might restart it or continue depending on args.
+				# We can check if it's already playing to avoid resetting if desired, but 'play' is usually safe.
+				anim_player.play("arms_armature|Combat_idle")
 
 func take_damage(amount: int):
 	health -= amount
