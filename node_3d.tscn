@@ -925,6 +925,7 @@ script = ExtResource("15_tcnuu")
 
 [node name="Sketchfab_Scene2 handsfists" parent="PlayerCharacter3D/Camera3D" instance=ExtResource("19_jsnrv")]
 transform = Transform3D(-0.12987627, 0, 0.0065428936, 0, 0.15, 0, -0.0056705074, 0, -0.14985724, -0.025, -0.81, 0.035)
+visible = false
 
 [node name="Skeleton3D" parent="PlayerCharacter3D/Camera3D/Sketchfab_Scene2 handsfists/Sketchfab_model/PSX_First_Person_Arms_fbx/Object_2/RootNode/arms_armature/Object_5" index="0"]
 bones/3/rotation = Quaternion(-0.5599478, -0.41408297, -0.28751191, 0.65751857)
