@@ -119,6 +119,8 @@ radius = 0.6
 height = 3.0
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jka67"]
+radius = 0.3
+height = 1.6
 
 [sub_resource type="GDScript" id="GDScript_time_system"]
 script/source = "extends Label
@@ -265,29 +267,29 @@ script = ExtResource("5_zombie")
 transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D its a zombie"]
-transform = Transform3D(0.5, 0, 0, 0, 0.8, 0, 0, 0, 0.5, 0, 0.8, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
-[node name="CharacterBody3D2 its a zombie" type="CharacterBody3D" parent="." groups=["blocks"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.667415, 106.177025, -13.805143)
+[node name="CharacterBody3D its a zombie2" type="CharacterBody3D" parent="." groups=["blocks"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9265177, 106.177025, -13.805143)
 script = ExtResource("5_zombie")
 
-[node name="Sketchfab_Scene zombie" parent="CharacterBody3D2 its a zombie" instance=ExtResource("3_jka67")]
+[node name="Sketchfab_Scene zombie" parent="CharacterBody3D its a zombie2" instance=ExtResource("3_jka67")]
 transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D2 its a zombie"]
-transform = Transform3D(0.5, 0, 0, 0, 0.8, 0, 0, 0, 0.5, 0, 0.8, 0)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D its a zombie2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
-[node name="CharacterBody3D3 its a zombie" type="CharacterBody3D" parent="." groups=["blocks"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.608122, 106.177025, -13.805143)
+[node name="CharacterBody3D its a zombie3" type="CharacterBody3D" parent="." groups=["blocks"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1792428, 106.177025, -13.805143)
 script = ExtResource("5_zombie")
 
-[node name="Sketchfab_Scene zombie" parent="CharacterBody3D3 its a zombie" instance=ExtResource("3_jka67")]
+[node name="Sketchfab_Scene zombie" parent="CharacterBody3D its a zombie3" instance=ExtResource("3_jka67")]
 transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D3 its a zombie"]
-transform = Transform3D(0.5, 0, 0, 0, 0.8, 0, 0, 0, 0.5, 0, 0.8, 0)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D its a zombie3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
 [node name="ESCCanvasLayer" type="CanvasLayer" parent="."]
