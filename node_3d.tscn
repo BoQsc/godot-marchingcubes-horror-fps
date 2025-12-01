@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://c2pp8ci31jce2"]
+[gd_scene load_steps=32 format=3 uid="uid://c2pp8ci31jce2"]
 
 [ext_resource type="AudioStream" uid="uid://i6o3hrbi2ac2" path="res://music/mysterious-dark-background-310162.mp3" id="1_i5arm"]
 [ext_resource type="PackedScene" uid="uid://ceaj1g6o3ms5k" path="res://props/grass plants 0/grass.glb" id="1_jsk3o"]
@@ -14,7 +14,7 @@
 [ext_resource type="Script" uid="uid://cdnnqwu84x4af" path="res://ui/HUDCompassBar.tres.gd" id="8_tereu"]
 [ext_resource type="Script" uid="uid://fdhxaetxv7my" path="res://ui/HUDToolbelt.tres.gd" id="9_cdqbm"]
 [ext_resource type="Script" uid="uid://dlmh64v2rdria" path="res://scripts/PlayerCharacter3D/Camera3D/Camera3D.tres.gd" id="13_3v7ru"]
-[ext_resource type="PackedScene" uid="uid://block123456" path="res://Block.tscn" id="13_tuemg"]
+[ext_resource type="Texture2D" uid="uid://cnvn56qv42mna" path="res://wood-block-texture.png" id="14_tuemg"]
 [ext_resource type="Script" uid="uid://dqeasbft388tr" path="res://scripts/PlayerCharacter3D/Camera3D/Sketchfab_Scene.tres.gd" id="15_tcnuu"]
 [ext_resource type="Script" uid="uid://bbf8dh10xrf1r" path="res://scripts/PlayerCharacter3D/AudioStreamPlayer3D.tres.gd" id="16_tcnuu"]
 
@@ -152,6 +152,14 @@ func advance_time():
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_noarx"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_a0tk4"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ab6iy"]
+albedo_texture = ExtResource("14_tuemg")
+
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.6, 0.4, 0.2, 1)
 
 [node name="Node3D" type="Node3D"]
 
@@ -771,9 +779,13 @@ shape = SubResource("CapsuleShape3D_a0tk4")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27548826, 0.40287018, -0.050864667)
 script = ExtResource("13_3v7ru")
 
-[node name="Block" parent="PlayerCharacter3D/Camera3D" instance=ExtResource("13_tuemg")]
-transform = Transform3D(0.22084568, 0, 0, 0, 0.31, 0, 0, 0, 0.2089067, 0.19500923, -0.19937134, -0.26929274)
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PlayerCharacter3D/Camera3D"]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.19500923, -0.19937134, -0.26929274)
 visible = false
+material_override = SubResource("StandardMaterial3D_ab6iy")
+mesh = SubResource("BoxMesh_1")
+skeleton = NodePath("")
+surface_material_override/0 = SubResource("StandardMaterial3D_1")
 
 [node name="Sketchfab_Scene" parent="PlayerCharacter3D/Camera3D" instance=ExtResource("4_r3fl7")]
 transform = Transform3D(-0.0049240384, 0, 0.0008682415, 0, 0.005, 0, -0.0008682415, 0, -0.0049240384, 0.09346646, -0.09446716, -0.15498024)
