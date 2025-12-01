@@ -1,0 +1,5 @@
+***
+Note on Tree Physics:
+Converting all tree instances from StaticBody3D to CharacterBody3D (to enable dynamic falling behavior due to gravity) has been identified as a potentially performance-heavy operation. For now, trees (specifically those using Tree.tscn as a StaticBody3D) will remain static and will not respond to gravity or take damage when shot. They may appear to "float" if the terrain beneath them is modified.
+This decision prioritizes current performance considerations.
+***
