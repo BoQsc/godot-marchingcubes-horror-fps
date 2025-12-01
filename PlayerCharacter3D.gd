@@ -72,9 +72,15 @@ func _ready():
 		toolbelt.slot_changed.connect(_on_slot_changed)
 		# Force update for initial state
 		_on_slot_changed(0)
+	
+	if hands:
+		var anim_player = hands.get_node_or_null("AnimationPlayer")
+		if anim_player:
+			anim_player.animation_finished.connect(_on_hands_animation_finished)
 
 func _process(delta):
 	handle_weapon_sway(delta)
+	handle_hands_actions(delta)
 
 func handle_weapon_sway(delta):
 	# Determine Aiming State (Only for Pistol / Slot 0)
@@ -138,6 +144,26 @@ func handle_weapon_sway(delta):
 	# Reset mouse input frame-by-frame (otherwise it drifts if no input)
 	mouse_input = Vector2.ZERO
 
+func handle_hands_actions(delta):
+	if not hands or not hands.visible:
+		return
+	
+	var anim_player = hands.get_node_or_null("AnimationPlayer")
+	if not anim_player:
+		return
+	
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		# Only play if not already playing punch to avoid restarting mid-punch
+		if anim_player.current_animation != "arms_armature|Combat_punch_right":
+			anim_player.play("arms_armature|Combat_punch_right")
+
+func _on_hands_animation_finished(anim_name):
+	if anim_name == "arms_armature|Combat_punch_right":
+		if hands and hands.visible: # Ensure hands are still active
+			var anim_player = hands.get_node_or_null("AnimationPlayer")
+			if anim_player:
+				anim_player.play("arms_armature|Combat_idle")
+
 func _on_slot_changed(index):
 	current_slot = index
 	if index == 0:
@@ -169,8 +195,6 @@ func _on_slot_changed(index):
 			hands.visible = true
 			var anim_player = hands.get_node_or_null("AnimationPlayer")
 			if anim_player:
-				# Use play() to start animation. If it's already playing, this might restart it or continue depending on args.
-				# We can check if it's already playing to avoid resetting if desired, but 'play' is usually safe.
 				anim_player.play("arms_armature|Combat_idle")
 
 func take_damage(amount: int):
