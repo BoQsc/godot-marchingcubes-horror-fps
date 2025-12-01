@@ -13,6 +13,10 @@ const RAMP_SCENE = preload("res://Block_ramp.tscn")
 var audio_player: AudioStreamPlayer3D
 var current_slot: int = 0
 
+# Ghost / Building variables
+var ghost_node: Node3D = null
+var block_rotation_index: int = 0 # 0 to 3, representing 0, 90, 180, 270 degrees
+
 func _ready():
 	# 1. Setup Audio
 	audio_player = AudioStreamPlayer3D.new()
@@ -29,8 +33,75 @@ func _ready():
 	if toolbelt:
 		toolbelt.slot_changed.connect(_on_slot_changed)
 
+func _process(delta):
+	update_ghost_transform()
+
 func _on_slot_changed(index):
 	current_slot = index
+	update_active_ghost()
+
+func update_active_ghost():
+	# Remove existing ghost
+	if ghost_node:
+		ghost_node.queue_free()
+		ghost_node = null
+	
+	var scene_to_spawn = null
+	if current_slot == 1:
+		scene_to_spawn = BLOCK_SCENE
+	elif current_slot == 2:
+		scene_to_spawn = RAMP_SCENE
+	
+	if scene_to_spawn:
+		ghost_node = scene_to_spawn.instantiate()
+		get_tree().root.add_child(ghost_node)
+		
+		# Make it transparent and non-colliding
+		prepare_ghost_node_recursive(ghost_node)
+		ghost_node.visible = false # Start hidden until raycast hits
+
+func prepare_ghost_node_recursive(node: Node):
+	if node is MeshInstance3D:
+		var mat = StandardMaterial3D.new()
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.albedo_color = Color(0.5, 0.8, 1.0, 0.4) # Blue-ish transparent
+		node.material_override = mat
+		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	
+	if node is CollisionShape3D or node is CollisionPolygon3D:
+		node.disabled = true
+	
+	for child in node.get_children():
+		prepare_ghost_node_recursive(child)
+
+func update_ghost_transform():
+	if not ghost_node: return
+	
+	# Perform raycast to find position
+	var camera = get_viewport().get_camera_3d()
+	if not camera: return
+	
+	var center_screen = get_viewport().get_visible_rect().size / 2
+	var from = camera.project_ray_origin(center_screen)
+	var to = from + camera.project_ray_normal(center_screen) * 1000 # Increased range
+	var space_state = get_world_3d().direct_space_state
+	var query = PhysicsRayQueryParameters3D.create(from, to)
+	
+	# Exclude the ghost itself just in case (though collision is disabled)
+	# query.exclude = [ghost_node] 
+	
+	var result = space_state.intersect_ray(query)
+	
+	if result:
+		ghost_node.visible = true
+		var pos = result.position + result.normal * 0.5
+		var snapped_pos = pos.snapped(Vector3(1, 1, 1))
+		ghost_node.global_position = snapped_pos
+		
+		# Apply rotation
+		ghost_node.global_rotation.y = deg_to_rad(block_rotation_index * 90.0)
+	else:
+		ghost_node.visible = false
 
 func setup_crosshair():
 	# Create a canvas layer so the UI sits above the 3D world
@@ -58,6 +129,13 @@ func _input(event):
 	# Check if the event is a Mouse Button event
 	if event is InputEventMouseButton:
 		if event.pressed:
+			# Rotation Logic (Scroll Wheel + CTRL)
+			if Input.is_key_pressed(KEY_CTRL):
+				if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+					block_rotation_index = (block_rotation_index + 1) % 4
+				elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+					block_rotation_index = (block_rotation_index - 1 + 4) % 4
+			
 			if event.button_index == MOUSE_BUTTON_LEFT:
 				if current_slot == 1:
 					place_block(BLOCK_SCENE)
@@ -248,6 +326,7 @@ func place_block(scene_to_place):
 			var block = scene_to_place.instantiate()
 			get_tree().root.add_child(block)
 			block.global_position = snapped_pos
+			block.global_rotation.y = deg_to_rad(block_rotation_index * 90.0)
 
 func remove_block():
 	var camera = get_viewport().get_camera_3d()

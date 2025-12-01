@@ -45,13 +45,16 @@ func setup_extra_slots():
 
 func _input(event):
 	var changed = false
+	
+	# Scroll wheel logic for slot switching (Only if CTRL is NOT held)
 	if event is InputEventMouseButton and event.pressed:
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			current_slot = (current_slot - 1 + 9) % 9
-			changed = true
-		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			current_slot = (current_slot + 1) % 9
-			changed = true
+		if not Input.is_key_pressed(KEY_CTRL):
+			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+				current_slot = (current_slot - 1 + 9) % 9
+				changed = true
+			if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				current_slot = (current_slot + 1) % 9
+				changed = true
 	
 	# Supports number keys 1-9
 	if event is InputEventKey and event.pressed:
