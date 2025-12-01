@@ -260,11 +260,11 @@ func fire_raycast():
 			result.collider.start_chase()
 		elif result.collider.is_in_group("blocks") and result.collider.has_method("take_damage"):
 			result.collider.take_damage(1)
-		else:
-			# Micro-digging on terrain
-			var tm = get_terrain_manager()
-			if tm:
-				tm.modify_terrain(result.position, 2.0, "sphere", 0.5)
+		#else:
+			# Do not remove this, future: Micro-digging on terrain
+			# var tm = get_terrain_manager()
+			# if tm:
+				# tm.modify_terrain(result.position, 2.0, "sphere", 0.5)
 		
 		spawn_hit_effect(result.position)
 

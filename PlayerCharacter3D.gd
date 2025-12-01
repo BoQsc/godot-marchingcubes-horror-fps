@@ -163,6 +163,25 @@ func handle_hands_actions(delta):
 				punch_sfx.stream = PUNCH_SFX
 				punch_sfx.pitch_scale = randf_range(0.9, 1.1)
 				punch_sfx.play()
+			
+			# Perform Raycast for Hit Detection
+			var space_state = get_world_3d().direct_space_state
+			var center_screen = get_viewport().get_visible_rect().size / 2
+			var from = camera.project_ray_origin(center_screen)
+			var to = from + camera.project_ray_normal(center_screen) * 2.5 # Short range for melee (2.5m)
+			var query = PhysicsRayQueryParameters3D.create(from, to)
+			var result = space_state.intersect_ray(query)
+			
+			if result:
+				if result.collider.is_in_group("zombies") and result.collider.has_method("take_damage"):
+					result.collider.take_damage(1)
+				elif result.collider.is_in_group("blocks") and result.collider.has_method("take_damage"):
+					result.collider.take_damage(1)
+				else:
+					# Terrain Interaction (Digging)
+					var tm = get_node_or_null("/root/Node3D/TerrainManager")
+					if tm:
+						tm.modify_terrain(result.position, 1.5, "sphere", 1.0) # Smaller hole than pistol
 
 func _on_hands_animation_finished(anim_name):
 	if anim_name == "arms_armature|Combat_punch_right":
