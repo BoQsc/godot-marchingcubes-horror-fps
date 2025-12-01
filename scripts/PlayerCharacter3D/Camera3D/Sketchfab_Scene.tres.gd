@@ -2,6 +2,7 @@ extends Node3D
 
 # Preload resources to prevent lag spikes
 const PISTOL_SOUND = preload("res://sfx/pistol-shot-233473.mp3")
+const RELOAD_SOUND = preload("res://sfx/mag-reload-81594.mp3")
 # Use preload for blocks too
 const BLOCK_SCENE = preload("res://Block.tscn")
 const RAMP_SCENE = preload("res://Block_ramp.tscn")
@@ -182,6 +183,9 @@ func reload_pistol():
 	is_reloading = true
 	animation_player.stop()
 	
+	audio_player.stream = RELOAD_SOUND
+	audio_player.play()
+	
 	# Play reload segment: 0.4s to 2.85s
 	# seek(0.4) then play
 	animation_player.play("allanims")
@@ -204,6 +208,7 @@ func play_animation_segment():
 	if animation_player and animation_player.has_animation("allanims"):
 		animation_player.stop()
 		
+		audio_player.stream = PISTOL_SOUND
 		audio_player.play()
 		animation_player.play("allanims")
 		
