@@ -262,75 +262,152 @@ script = ExtResource("2_terrain")
 chunk_scene = ExtResource("3_chunk")
 player = NodePath("../PlayerCharacter3D")
 
-[node name="CharacterBody3D its a zombie" type="CharacterBody3D" parent="." groups=["blocks"]]
+[node name="Node3D Zombies Group 1" type="Node3D" parent="."]
+
+[node name="CharacterBody3D its a zombie" type="CharacterBody3D" parent="Node3D Zombies Group 1" groups=["blocks"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 106.177025, -16.845207)
 floor_max_angle = 3.1415927
 script = ExtResource("5_zombie")
 
-[node name="Sketchfab_Scene zombie" parent="CharacterBody3D its a zombie" instance=ExtResource("3_jka67")]
+[node name="Sketchfab_Scene zombie" parent="Node3D Zombies Group 1/CharacterBody3D its a zombie" instance=ExtResource("3_jka67")]
 transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D its a zombie"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D Zombies Group 1/CharacterBody3D its a zombie"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.863472, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
-[node name="CharacterBody3D its a zombie2" type="CharacterBody3D" parent="." groups=["blocks"]]
+[node name="CharacterBody3D its a zombie2" type="CharacterBody3D" parent="Node3D Zombies Group 1" groups=["blocks"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2389532, 106.177025, -13.805143)
 floor_max_angle = 3.1415927
 script = ExtResource("5_zombie")
 
-[node name="Sketchfab_Scene zombie" parent="CharacterBody3D its a zombie2" instance=ExtResource("3_jka67")]
+[node name="Sketchfab_Scene zombie" parent="Node3D Zombies Group 1/CharacterBody3D its a zombie2" instance=ExtResource("3_jka67")]
 transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D its a zombie2"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D Zombies Group 1/CharacterBody3D its a zombie2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.863472, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
-[node name="CharacterBody3D its a zombie5" type="CharacterBody3D" parent="." groups=["blocks"]]
+[node name="CharacterBody3D its a zombie5" type="CharacterBody3D" parent="Node3D Zombies Group 1" groups=["blocks"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.710104, 106.177025, -13.805143)
 floor_max_angle = 3.1415927
 script = ExtResource("5_zombie")
 
-[node name="Sketchfab_Scene zombie" parent="CharacterBody3D its a zombie5" instance=ExtResource("3_jka67")]
+[node name="Sketchfab_Scene zombie" parent="Node3D Zombies Group 1/CharacterBody3D its a zombie5" instance=ExtResource("3_jka67")]
 transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D its a zombie5"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D Zombies Group 1/CharacterBody3D its a zombie5"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.863472, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
-[node name="CharacterBody3D its a zombie3" type="CharacterBody3D" parent="." groups=["blocks"]]
+[node name="CharacterBody3D its a zombie3" type="CharacterBody3D" parent="Node3D Zombies Group 1" groups=["blocks"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2773911, 106.177025, -13.805143)
 floor_max_angle = 3.1415927
 script = ExtResource("5_zombie")
 
-[node name="Sketchfab_Scene zombie" parent="CharacterBody3D its a zombie3" instance=ExtResource("3_jka67")]
+[node name="Sketchfab_Scene zombie" parent="Node3D Zombies Group 1/CharacterBody3D its a zombie3" instance=ExtResource("3_jka67")]
 transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D its a zombie3"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D Zombies Group 1/CharacterBody3D its a zombie3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.863472, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
-[node name="CharacterBody3D its a zombie4" type="CharacterBody3D" parent="." groups=["blocks"]]
+[node name="CharacterBody3D its a zombie4" type="CharacterBody3D" parent="Node3D Zombies Group 1" groups=["blocks"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.902351, 106.177025, -13.805143)
 floor_max_angle = 3.1415927
 script = ExtResource("5_zombie")
 
-[node name="Sketchfab_Scene zombie" parent="CharacterBody3D its a zombie4" instance=ExtResource("3_jka67")]
+[node name="Sketchfab_Scene zombie" parent="Node3D Zombies Group 1/CharacterBody3D its a zombie4" instance=ExtResource("3_jka67")]
 transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D its a zombie4"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D Zombies Group 1/CharacterBody3D its a zombie4"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.863472, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
-[node name="CharacterBody3D its a zombie6" type="CharacterBody3D" parent="." groups=["blocks"]]
+[node name="CharacterBody3D its a zombie6" type="CharacterBody3D" parent="Node3D Zombies Group 1" groups=["blocks"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.463496, 106.177025, -13.805143)
 floor_max_angle = 3.1415927
 script = ExtResource("5_zombie")
 
-[node name="Sketchfab_Scene zombie" parent="CharacterBody3D its a zombie6" instance=ExtResource("3_jka67")]
+[node name="Sketchfab_Scene zombie" parent="Node3D Zombies Group 1/CharacterBody3D its a zombie6" instance=ExtResource("3_jka67")]
 transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D its a zombie6"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D Zombies Group 1/CharacterBody3D its a zombie6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.863472, 0)
+shape = SubResource("CapsuleShape3D_jka67")
+
+[node name="Node3D Zombies Group 2" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 21.275108)
+
+[node name="CharacterBody3D its a zombie" type="CharacterBody3D" parent="Node3D Zombies Group 2" groups=["blocks"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 106.177025, -16.845207)
+floor_max_angle = 3.1415927
+script = ExtResource("5_zombie")
+
+[node name="Sketchfab_Scene zombie" parent="Node3D Zombies Group 2/CharacterBody3D its a zombie" instance=ExtResource("3_jka67")]
+transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D Zombies Group 2/CharacterBody3D its a zombie"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.863472, 0)
+shape = SubResource("CapsuleShape3D_jka67")
+
+[node name="CharacterBody3D its a zombie2" type="CharacterBody3D" parent="Node3D Zombies Group 2" groups=["blocks"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2389532, 106.177025, -13.805143)
+floor_max_angle = 3.1415927
+script = ExtResource("5_zombie")
+
+[node name="Sketchfab_Scene zombie" parent="Node3D Zombies Group 2/CharacterBody3D its a zombie2" instance=ExtResource("3_jka67")]
+transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D Zombies Group 2/CharacterBody3D its a zombie2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.863472, 0)
+shape = SubResource("CapsuleShape3D_jka67")
+
+[node name="CharacterBody3D its a zombie5" type="CharacterBody3D" parent="Node3D Zombies Group 2" groups=["blocks"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.710104, 106.177025, -13.805143)
+floor_max_angle = 3.1415927
+script = ExtResource("5_zombie")
+
+[node name="Sketchfab_Scene zombie" parent="Node3D Zombies Group 2/CharacterBody3D its a zombie5" instance=ExtResource("3_jka67")]
+transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D Zombies Group 2/CharacterBody3D its a zombie5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.863472, 0)
+shape = SubResource("CapsuleShape3D_jka67")
+
+[node name="CharacterBody3D its a zombie3" type="CharacterBody3D" parent="Node3D Zombies Group 2" groups=["blocks"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2773911, 106.177025, -13.805143)
+floor_max_angle = 3.1415927
+script = ExtResource("5_zombie")
+
+[node name="Sketchfab_Scene zombie" parent="Node3D Zombies Group 2/CharacterBody3D its a zombie3" instance=ExtResource("3_jka67")]
+transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D Zombies Group 2/CharacterBody3D its a zombie3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.863472, 0)
+shape = SubResource("CapsuleShape3D_jka67")
+
+[node name="CharacterBody3D its a zombie4" type="CharacterBody3D" parent="Node3D Zombies Group 2" groups=["blocks"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.902351, 106.177025, -13.805143)
+floor_max_angle = 3.1415927
+script = ExtResource("5_zombie")
+
+[node name="Sketchfab_Scene zombie" parent="Node3D Zombies Group 2/CharacterBody3D its a zombie4" instance=ExtResource("3_jka67")]
+transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D Zombies Group 2/CharacterBody3D its a zombie4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.863472, 0)
+shape = SubResource("CapsuleShape3D_jka67")
+
+[node name="CharacterBody3D its a zombie6" type="CharacterBody3D" parent="Node3D Zombies Group 2" groups=["blocks"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.463496, 106.177025, -13.805143)
+floor_max_angle = 3.1415927
+script = ExtResource("5_zombie")
+
+[node name="Sketchfab_Scene zombie" parent="Node3D Zombies Group 2/CharacterBody3D its a zombie6" instance=ExtResource("3_jka67")]
+transform = Transform3D(9.5, 0, 0, 0, 9.5, 0, 0, 0, 9.5, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D Zombies Group 2/CharacterBody3D its a zombie6"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.863472, 0)
 shape = SubResource("CapsuleShape3D_jka67")
 
