@@ -12,6 +12,7 @@ const RAMP_SCENE = preload("res://Block_ramp.tscn")
 # Variable to hold the dynamic audio player
 var audio_player: AudioStreamPlayer3D
 var current_slot: int = 0
+var is_reloading: bool = false
 
 # Ghost / Building variables
 var ghost_node: Node3D = null
@@ -125,6 +126,11 @@ func _input(event):
 	# SAFETY CHECK: Do not shoot if mouse is visible (Menu is open)
 	if Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE:
 		return
+	
+	# Reload Input
+	if event.is_action_pressed("reload") or (event is InputEventKey and event.pressed and event.keycode == KEY_R):
+		if current_slot == 0 and not is_reloading:
+			reload_pistol()
 
 	# Check if the event is a Mouse Button event
 	if event is InputEventMouseButton:
@@ -143,6 +149,9 @@ func _input(event):
 					place_block(RAMP_SCENE)
 				else:
 					# Pistol / Tool logic
+					# Prevent shooting if reloading
+					if is_reloading: return
+					
 					play_animation_segment()
 					if Input.is_key_pressed(KEY_SHIFT):
 						fire_build("box") # Shift + Left Click to place terrain block
@@ -156,6 +165,8 @@ func _input(event):
 					remove_block()
 				else:
 					# Pistol Logic
+					if is_reloading: return
+					
 					if Input.is_key_pressed(KEY_CTRL):
 						play_animation_segment()
 						fire_dig() # Ctrl + Right Click to dig terrain
@@ -165,9 +176,29 @@ func _input(event):
 					# else: plain Right Click is now ADS (Aim Down Sights), handled in PlayerCharacter3D.gd
 					# We do NOT play the animation for ADS to keep the sight steady
 
+func reload_pistol():
+	if not animation_player or not animation_player.has_animation("allanims"): return
+	
+	is_reloading = true
+	animation_player.stop()
+	
+	# Play reload segment: 0.4s to 2.85s
+	# seek(0.4) then play
+	animation_player.play("allanims")
+	animation_player.seek(0.4, true)
+	
+	# Wait for reload duration (2.85 - 0.4 = 2.45s)
+	await get_tree().create_timer(2.45).timeout
+	
+	if is_instance_valid(animation_player):
+		animation_player.stop()
+	
+	is_reloading = false
+
 func play_animation_segment():
 	# Only play if pistol is active (Slot 0)
 	if current_slot != 0: return
+	if is_reloading: return # Safety check
 
 	# check if the animation exists to avoid errors
 	if animation_player and animation_player.has_animation("allanims"):
@@ -176,11 +207,11 @@ func play_animation_segment():
 		audio_player.play()
 		animation_player.play("allanims")
 		
-		# Create a temporary timer for 0.3 seconds and wait for it to finish
+		# Create a temporary timer for 0.4 seconds and wait for it to finish
 		await get_tree().create_timer(0.4).timeout
 		
 		# SAFETY CHECK: Ensure the node and player still exist after the wait
-		if is_instance_valid(animation_player):
+		if is_instance_valid(animation_player) and not is_reloading:
 			animation_player.stop()
 
 # Helper to find TerrainManager even if path changes
