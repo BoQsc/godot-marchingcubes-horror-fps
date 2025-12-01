@@ -221,7 +221,8 @@ func take_damage(amount: int):
 		die()
 
 func die():
-	current_state = "DEAD"
+	# Set state to DEAD through the state machine to stop sounds/animations properly
+	change_state("DEAD") 
 	print("Zombie Died!")
 	velocity = Vector3.ZERO
 	
