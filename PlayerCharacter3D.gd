@@ -10,6 +10,21 @@ const WATER_LEVEL = 15.0
 
 @onready var camera = $Camera3D
 
+# Weapon Sway & Bobbing
+@onready var pistol = $Camera3D/Sketchfab_Scene
+@onready var block_holding = $"Camera3D/MeshInstance3D BlockHolding"
+
+var pistol_origin: Vector3
+var block_origin: Vector3
+var mouse_input: Vector2
+var sway_time: float = 0.0
+
+# Sway Settings
+const SWAY_AMOUNT = 0.002      # How much mouse movement affects position
+const SWAY_SMOOTHING = 10.0    # How fast it returns to center
+const BOB_FREQ = 10.0          # Speed of walking bob
+const BOB_AMP = 0.01           # Distance of walking bob
+
 var environment: Environment
 var original_fog_enabled: bool = false
 var original_fog_color: Color
@@ -20,6 +35,10 @@ var max_health: int = 10
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	
+	# Store initial positions for sway
+	if pistol: pistol_origin = pistol.position
+	if block_holding: block_origin = block_holding.position
 	
 	# Get the WorldEnvironment from the scene root
 	var world_env = get_node("/root/Node3D/WorldEnvironment")
@@ -36,10 +55,45 @@ func _ready():
 	if toolbelt:
 		toolbelt.slot_changed.connect(_on_slot_changed)
 
-func _on_slot_changed(index):
-	var pistol = camera.get_node_or_null("Sketchfab_Scene")
-	var block_holding = camera.get_node_or_null("MeshInstance3D BlockHolding")
+func _process(delta):
+	handle_weapon_sway(delta)
+
+func handle_weapon_sway(delta):
+	# 1. Mouse Sway (Lag)
+	# Invert mouse input for drag effect
+	var target_sway = Vector3(
+		-mouse_input.x * SWAY_AMOUNT,
+		mouse_input.y * SWAY_AMOUNT,
+		0
+	)
 	
+	# 2. Movement Bobbing
+	# Only bob when moving on floor
+	var speed = velocity.length()
+	var bob_offset = Vector3.ZERO
+	
+	if is_on_floor() and speed > 1.0:
+		sway_time += delta * speed
+		bob_offset.y = sin(sway_time * BOB_FREQ * 0.5) * BOB_AMP
+		bob_offset.x = cos(sway_time * BOB_FREQ) * BOB_AMP * 0.5
+	else:
+		# Reset time gently or just leave it, snapping back is fine
+		pass
+
+	# Combine
+	var total_pistol_target = pistol_origin + target_sway + bob_offset
+	var total_block_target = block_origin + target_sway + bob_offset
+	
+	# Apply with smoothing
+	if pistol:
+		pistol.position = pistol.position.lerp(total_pistol_target, delta * SWAY_SMOOTHING)
+	if block_holding:
+		block_holding.position = block_holding.position.lerp(total_block_target, delta * SWAY_SMOOTHING)
+	
+	# Reset mouse input frame-by-frame (otherwise it drifts if no input)
+	mouse_input = Vector2.ZERO
+
+func _on_slot_changed(index):
 	if index == 0:
 		# Pistol
 		if pistol: pistol.visible = true
@@ -86,6 +140,7 @@ func update_health_ui():
 
 func _unhandled_input(event):
 	if event is InputEventMouseMotion:
+		mouse_input = event.relative # Capture for sway
 		rotate_y(-event.relative.x * MOUSE_SENSITIVITY)
 		camera.rotate_x(-event.relative.y * MOUSE_SENSITIVITY)
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-90), deg_to_rad(90))
