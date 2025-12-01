@@ -779,7 +779,7 @@ shape = SubResource("CapsuleShape3D_a0tk4")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27548826, 0.40287018, -0.050864667)
 script = ExtResource("13_3v7ru")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="PlayerCharacter3D/Camera3D"]
+[node name="MeshInstance3D BlockHolding" type="MeshInstance3D" parent="PlayerCharacter3D/Camera3D"]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.19500923, -0.19937134, -0.26929274)
 visible = false
 material_override = SubResource("StandardMaterial3D_ab6iy")
